@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Heart, User, Mail, Phone, MapPin, Calendar, LogOut, Settings, Bell, Shield, Users, Clock, CheckCircle, XCircle, Clock as ClockIcon, Droplets } from 'lucide-react';
+import { Heart, User, Mail, Phone, MapPin, Calendar, LogOut, Settings, Bell, Shield, Users, Clock, CheckCircle, XCircle, Droplets } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 
 interface User {
   id: number;
@@ -92,30 +94,35 @@ export default function DashboardPage() {
 
   const getBloodGroupBadgeClass = (bloodGroup: string) => {
     const group = bloodGroup.toLowerCase().replace('+', '-positive').replace('-', '-negative');
-    return `blood-badge-${group}`;
+    // Mapping to tailwind classes for badges
+    const base = "px-3 py-1 rounded-full text-sm font-bold shadow-sm";
+    if (group.includes('positive')) return `${base} bg-red-100 text-red-700 border border-red-200`;
+    if (group.includes('negative')) return `${base} bg-red-50 text-red-600 border border-red-200`;
+    return `${base} bg-gray-100 text-gray-700`;
   };
 
   const getStatusBadgeClass = (status: string) => {
+    const base = "px-3 py-1 rounded-full text-xs font-medium border";
     switch (status) {
       case 'pending':
-        return 'status-pending';
+        return `${base} bg-amber-50 text-amber-700 border-amber-200`;
       case 'approved':
-        return 'status-approved';
+        return `${base} bg-green-50 text-green-700 border-green-200`;
       case 'rejected':
-        return 'status-rejected';
+        return `${base} bg-red-50 text-red-700 border-red-200`;
       default:
-        return 'status-pending';
+        return `${base} bg-gray-50 text-gray-700 border-gray-200`;
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="blood-gradient h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Heart className="h-8 w-8 text-white animate-pulse" />
+          <div className="bg-primary/10 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Heart className="h-8 w-8 text-primary animate-pulse" />
           </div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -126,41 +133,41 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-background">
       {/* Professional Navigation */}
-      <nav className="nav-glass sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto container-padding">
+      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="blood-gradient h-10 w-10 rounded-xl flex items-center justify-center shadow-lg">
-                <Heart className="h-6 w-6 text-white" />
+              <div className="bg-primary h-10 w-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <Heart className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <span className="text-xl font-bold text-gray-900">Blood Bank BD</span>
-                <p className="text-xs text-gray-600">Professional Blood Management</p>
+                <span className="text-xl font-bold text-foreground">Blood Bank BD</span>
+                <p className="text-xs text-muted-foreground">Professional Blood Management</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700 font-medium">Welcome, {user.name}</span>
-              <button onClick={handleLogout} className="btn-secondary text-sm">
+              <span className="text-foreground font-medium hidden sm:inline-block">Welcome, {user.name}</span>
+              <Button onClick={handleLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Dashboard Content */}
-      <section className="section-padding">
-        <div className="max-w-7xl mx-auto container-padding">
+      <section className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="heading-1 text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-4">
               Professional Dashboard
             </h1>
-            <p className="body-text text-gray-600">
+            <p className="text-lg text-muted-foreground">
               Manage your profile and contact requests
             </p>
           </div>
@@ -168,228 +175,243 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Card */}
             <div className="lg:col-span-1">
-              <div className="card">
-                <div className="text-center mb-6">
-                  <div className="blood-gradient h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <User className="h-10 w-10 text-white" />
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center mb-6">
+                    <div className="bg-primary/10 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                      <User className="h-12 w-12 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-semibold text-foreground mb-2">{user.name}</h2>
+                    <span className={getBloodGroupBadgeClass(user.blood_group)}>
+                      {user.blood_group}
+                    </span>
                   </div>
-                  <h2 className="heading-2 text-gray-900 mb-2">{user.name}</h2>
-                  <span className={`blood-badge ${getBloodGroupBadgeClass(user.blood_group)}`}>
-                    {user.blood_group}
-                  </span>
-                </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Email</p>
-                      <p className="text-sm text-gray-600">{user.email}</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                      <Mail className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Email</p>
+                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Location</p>
+                        <p className="text-sm text-muted-foreground">{user.area}, {user.city}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3 p-3 bg-green-50/50 rounded-lg border border-green-100">
+                      <Shield className="h-5 w-5 text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium text-green-900">Status</p>
+                        <p className="text-sm text-green-700">Verified Donor</p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <MapPin className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Location</p>
-                      <p className="text-sm text-gray-600">{user.area}, {user.city}</p>
-                    </div>
+                  <div className="mt-6 space-y-3">
+                    <Link href="/find-donors">
+                      <Button className="w-full">
+                        <Users className="h-4 w-4 mr-2" />
+                        Find Donors
+                      </Button>
+                    </Link>
+                    <Link href="/">
+                      <Button variant="outline" className="w-full">
+                        Back to Home
+                      </Button>
+                    </Link>
                   </div>
-
-                  <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <Shield className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="text-sm font-medium text-green-900">Status</p>
-                      <p className="text-sm text-green-700">Verified Donor</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-3">
-                  <Link href="/find-donors" className="btn-primary w-full">
-                    <Users className="h-4 w-4 mr-2" />
-                    Find Donors
-                  </Link>
-                  <Link href="/" className="btn-outline w-full">
-                    Back to Home
-                  </Link>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Contact Requests */}
             <div className="lg:col-span-2">
-              <div className="card">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="medical-gradient h-12 w-12 rounded-xl flex items-center justify-center shadow-lg">
-                      <Bell className="h-6 w-6 text-white" />
+              <Card className="h-full">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-blue-100 h-10 w-10 rounded-lg flex items-center justify-center">
+                        <Bell className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <CardTitle>Contact Requests</CardTitle>
+                        <CardDescription>Manage incoming contact requests</CardDescription>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="heading-2 text-gray-900">Contact Requests</h2>
-                      <p className="text-gray-600">Manage incoming contact requests</p>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-foreground">{contactRequests.length}</div>
+                      <div className="text-xs text-muted-foreground">Total Requests</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-gray-900">{contactRequests.length}</div>
-                    <div className="text-sm text-gray-600">Total Requests</div>
-                  </div>
-                </div>
-
-                {contactRequests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="medical-gradient h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <Bell className="h-8 w-8 text-white" />
+                </CardHeader>
+                <CardContent>
+                  {contactRequests.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="bg-muted h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Bell className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-lg font-medium text-foreground mb-2">No Contact Requests</h3>
+                      <p className="text-muted-foreground mb-6">
+                        You haven't received any contact requests yet. 
+                        Your profile is visible to blood seekers.
+                      </p>
+                      <Link href="/find-donors">
+                        <Button>Find Other Donors</Button>
+                      </Link>
                     </div>
-                    <h3 className="heading-3 text-gray-900 mb-2">No Contact Requests</h3>
-                    <p className="text-gray-600 mb-6">
-                      You haven't received any contact requests yet. 
-                      Your profile is visible to blood seekers.
-                    </p>
-                    <Link href="/find-donors" className="btn-primary">
-                      Find Other Donors
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {contactRequests.map((request) => (
-                      <div key={request.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="blood-gradient h-10 w-10 rounded-xl flex items-center justify-center shadow-lg">
-                              <User className="h-5 w-5 text-white" />
+                  ) : (
+                    <div className="space-y-4">
+                      {contactRequests.map((request) => (
+                        <div key={request.id} className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center space-x-3">
+                              <div className="bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center">
+                                <User className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-foreground">{request.requester_name}</h3>
+                                <p className="text-sm text-muted-foreground">{request.requester_email}</p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-gray-900">{request.requester_name}</h3>
-                              <p className="text-sm text-gray-600">{request.requester_email}</p>
+                            <span className={getStatusBadgeClass(request.status)}>
+                              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                              <Droplets className="h-4 w-4" />
+                              <span>Blood Group: {request.requester_blood_group}</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                              <MapPin className="h-4 w-4" />
+                              <span>Location: {request.requester_area}</span>
+                            </div>
+                            {request.requester_phone && (
+                              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                <Phone className="h-4 w-4" />
+                                <span>Phone: {request.requester_phone}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                              <Calendar className="h-4 w-4" />
+                              <span>Requested: {new Date(request.created_at).toLocaleDateString()}</span>
                             </div>
                           </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(request.status)}`}>
-                            {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                          </span>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <Droplets className="h-4 w-4" />
-                            <span>Blood Group: {request.requester_blood_group}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <MapPin className="h-4 w-4" />
-                            <span>Location: {request.requester_area}</span>
-                          </div>
-                          {request.requester_phone && (
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                              <Phone className="h-4 w-4" />
-                              <span>Phone: {request.requester_phone}</span>
+                          {request.message && (
+                            <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                              <p className="text-sm text-foreground">{request.message}</p>
                             </div>
                           )}
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <Calendar className="h-4 w-4" />
-                            <span>Requested: {new Date(request.created_at).toLocaleDateString()}</span>
-                          </div>
+
+                          {request.status === 'pending' && (
+                            <div className="flex space-x-3">
+                              <Button
+                                onClick={() => handleContactRequestResponse(request.id, 'approved')}
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Approve
+                              </Button>
+                              <Button
+                                onClick={() => handleContactRequestResponse(request.id, 'rejected')}
+                                size="sm"
+                                variant="destructive"
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+
+                          {request.status === 'approved' && (
+                            <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
+                              <CheckCircle className="h-4 w-4" />
+                              <span className="text-sm font-medium">Contact information shared</span>
+                            </div>
+                          )}
+
+                          {request.status === 'rejected' && (
+                            <div className="flex items-center space-x-2 text-destructive bg-destructive/10 px-3 py-2 rounded-lg border border-destructive/20">
+                              <XCircle className="h-4 w-4" />
+                              <span className="text-sm font-medium">Request declined</span>
+                            </div>
+                          )}
                         </div>
-
-                        {request.message && (
-                          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-700">{request.message}</p>
-                          </div>
-                        )}
-
-                        {request.status === 'pending' && (
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={() => handleContactRequestResponse(request.id, 'approved')}
-                              className="btn-primary text-sm inline-flex items-center"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleContactRequestResponse(request.id, 'rejected')}
-                              className="btn-secondary text-sm inline-flex items-center"
-                            >
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Reject
-                            </button>
-                          </div>
-                        )}
-
-                        {request.status === 'approved' && (
-                          <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg">
-                            <CheckCircle className="h-4 w-4" />
-                            <span className="text-sm font-medium">Contact information shared</span>
-                          </div>
-                        )}
-
-                        {request.status === 'rejected' && (
-                          <div className="flex items-center space-x-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg">
-                            <XCircle className="h-4 w-4" />
-                            <span className="text-sm font-medium">Request declined</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
 
           {/* Statistics Section */}
           <div className="mt-16">
-            <div className="card bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-              <div className="text-center mb-8">
-                <div className="bg-purple-100 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Heart className="h-8 w-8 text-purple-600" />
-                </div>
-                <h3 className="heading-3 text-purple-900 mb-2">Your Impact</h3>
-                <p className="text-purple-800">
-                  Track your contribution to the blood donation community
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div className="blood-gradient h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                    <Users className="h-6 w-6 text-white" />
+            <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/10">
+              <CardContent className="pt-8">
+                <div className="text-center mb-8">
+                  <div className="bg-primary/10 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Heart className="h-8 w-8 text-primary" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">{contactRequests.length}</div>
-                  <div className="text-sm text-gray-600">Contact Requests</div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Your Impact</h3>
+                  <p className="text-muted-foreground">
+                    Track your contribution to the blood donation community
+                  </p>
                 </div>
                 
-                <div className="text-center">
-                  <div className="medical-gradient h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                    <CheckCircle className="h-6 w-6 text-white" />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
+                    <div className="bg-primary/10 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Users className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">{contactRequests.length}</div>
+                    <div className="text-sm text-muted-foreground">Contact Requests</div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {contactRequests.filter(r => r.status === 'approved').length}
+                  
+                  <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
+                    <div className="bg-green-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {contactRequests.filter(r => r.status === 'approved').length}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Approved Requests</div>
                   </div>
-                  <div className="text-sm text-gray-600">Approved Requests</div>
+                  
+                  <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
+                    <div className="bg-amber-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Clock className="h-6 w-6 text-amber-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {contactRequests.filter(r => r.status === 'pending').length}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Pending Requests</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
+                    <div className="bg-blue-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Shield className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">Active</div>
+                    <div className="text-sm text-muted-foreground">Account Status</div>
+                  </div>
                 </div>
-                
-                <div className="text-center">
-                  <div className="bg-gradient-to-r from-green-600 to-emerald-600 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                    <Clock className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {contactRequests.filter(r => r.status === 'pending').length}
-                  </div>
-                  <div className="text-sm text-gray-600">Pending Requests</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                    <Shield className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900">Active</div>
-                  <div className="text-sm text-gray-600">Account Status</div>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
     </div>
   );
-} 
+}
+
+ 
