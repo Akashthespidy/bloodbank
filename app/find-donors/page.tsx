@@ -51,9 +51,9 @@ export default function FindDonorsPage() {
   const form = useForm<SearchForm>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      bloodGroup: '',
-      area: '',
-      city: '',
+      bloodGroup: 'all',
+      area: 'all',
+      city: 'all',
     },
   });
 
@@ -69,9 +69,9 @@ export default function FindDonorsPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (filters?.bloodGroup) params.append('bloodGroup', filters.bloodGroup);
-      if (filters?.area) params.append('area', filters.area);
-      if (filters?.city) params.append('city', filters.city);
+      if (filters?.bloodGroup && filters.bloodGroup !== 'all') params.append('bloodGroup', filters.bloodGroup);
+      if (filters?.area && filters.area !== 'all') params.append('area', filters.area);
+      if (filters?.city && filters.city !== 'all') params.append('city', filters.city);
 
       const response = await fetch(`/api/donors?${params}`);
       if (response.ok) {
@@ -157,7 +157,7 @@ export default function FindDonorsPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">All Blood Groups</SelectItem>
+                              <SelectItem value="all">All Blood Groups</SelectItem>
                               {bloodGroups.map((group) => (
                                 <SelectItem key={group} value={group}>
                                   <div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ export default function FindDonorsPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">All Cities</SelectItem>
+                              <SelectItem value="all">All Cities</SelectItem>
                               {bangladeshCities.map((city) => (
                                 <SelectItem key={city} value={city}>
                                   <div className="flex items-center gap-2">
@@ -215,7 +215,7 @@ export default function FindDonorsPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">All Areas</SelectItem>
+                              <SelectItem value="all">All Areas</SelectItem>
                               {bangladeshAreas.map((area) => (
                                 <SelectItem key={area} value={area}>
                                   <div className="flex items-center gap-2">
