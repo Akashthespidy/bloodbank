@@ -9,6 +9,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -21,8 +29,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loginForm = useForm<LoginForm>({
+  const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
   const handleLogin = async (data: LoginForm) => {
@@ -53,7 +65,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Left Side - Hero Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-muted">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-primary/5">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -82,59 +94,63 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="email">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    className="pl-10"
-                    {...loginForm.register('email')}
-                  />
-                </div>
-                {loginForm.formState.errors.email && (
-                  <p className="text-sm text-destructive">
-                    {loginForm.formState.errors.email.message}
-                  </p>
-                )}
-              </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            type="email"
+                            placeholder="m@example.com"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="password">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    className="pl-10 pr-10"
-                    {...loginForm.register('password')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                {loginForm.formState.errors.password && (
-                  <p className="text-sm text-destructive">
-                    {loginForm.formState.errors.password.message}
-                  </p>
-                )}
-              </div>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            className="pl-10 pr-10"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </form>
+            </Form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 text-center">
             <div className="text-sm text-muted-foreground">

@@ -10,6 +10,21 @@ import { bloodGroups, bangladeshCities, bangladeshAreas } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -27,8 +42,17 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const registerForm = useForm<RegisterForm>({
+  const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      phone: '',
+      bloodGroup: 'A+',
+      area: '',
+      city: '',
+    },
   });
 
   const handleRegister = async (data: RegisterForm) => {
@@ -57,15 +81,15 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Left Side - Hero Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-muted">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-primary/5">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1576765607924-bf60b2f36b88?auto=format&fit=crop&w=2070&q=80')",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-700/90 to-blue-600/70" />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-12 text-center">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-primary-foreground p-12 text-center">
           <div className="bg-white/20 p-4 rounded-2xl mb-8 backdrop-blur-sm">
             <Heart className="h-12 w-12 text-white fill-white" />
           </div>
@@ -78,7 +102,7 @@ export default function RegisterPage() {
 
       {/* Right Side - Register Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 overflow-y-auto">
-        <Card className="w-full max-w-md border-none shadow-none">
+        <Card className="w-full max-w-md border-none shadow-none my-8">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
             <CardDescription>
@@ -86,105 +110,174 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="name">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input id="name" placeholder="John Doe" className="pl-10" {...registerForm.register('name')} />
-                </div>
-                {registerForm.formState.errors.name && <p className="text-sm text-destructive">{registerForm.formState.errors.name.message}</p>}
-              </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleRegister)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input placeholder="John Doe" className="pl-10" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input id="email" type="email" placeholder="m@example.com" className="pl-10" {...registerForm.register('email')} />
-                </div>
-                {registerForm.formState.errors.email && <p className="text-sm text-destructive">{registerForm.formState.errors.email.message}</p>}
-              </div>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input type="email" placeholder="m@example.com" className="pl-10" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="password">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input id="password" type={showPassword ? 'text' : 'password'} className="pl-10 pr-10" {...registerForm.register('password')} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground">
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                {registerForm.formState.errors.password && <p className="text-sm text-destructive">{registerForm.formState.errors.password.message}</p>}
-              </div>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input type={showPassword ? 'text' : 'password'} className="pl-10 pr-10" {...field} />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="phone">Phone (Optional)</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input id="phone" type="tel" placeholder="+880..." className="pl-10" {...registerForm.register('phone')} />
-                </div>
-              </div>
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone (Optional)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input type="tel" placeholder="+880..." className="pl-10" {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none" htmlFor="bloodGroup">Blood Group</label>
-                  <div className="relative">
-                    <Droplets className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                    <select
-                      id="bloodGroup"
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
-                      {...registerForm.register('bloodGroup')}
-                    >
-                      <option value="">Select</option>
-                      {bloodGroups.map((group) => (
-                        <option key={group} value={group}>{group}</option>
-                      ))}
-                    </select>
-                  </div>
-                  {registerForm.formState.errors.bloodGroup && <p className="text-sm text-destructive">{registerForm.formState.errors.bloodGroup.message}</p>}
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="bloodGroup"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Blood Group</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {bloodGroups.map((group) => (
+                              <SelectItem key={group} value={group}>
+                                <div className="flex items-center gap-2">
+                                  <Droplets className="h-4 w-4 text-primary" />
+                                  {group}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {bangladeshCities.map((city) => (
+                              <SelectItem key={city} value={city}>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-primary" />
+                                  {city}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none" htmlFor="city">City</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                    <select
-                      id="city"
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
-                      {...registerForm.register('city')}
-                    >
-                      <option value="">Select</option>
-                      {bangladeshCities.map((city) => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
-                  </div>
-                  {registerForm.formState.errors.city && <p className="text-sm text-destructive">{registerForm.formState.errors.city.message}</p>}
-                </div>
-              </div>
+                <FormField
+                  control={form.control}
+                  name="area"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Area</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Area" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {bangladeshAreas.map((area) => (
+                            <SelectItem key={area} value={area}>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-primary" />
+                                {area}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="area">Area</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <select
-                    id="area"
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
-                    {...registerForm.register('area')}
-                  >
-                    <option value="">Select Area</option>
-                    {bangladeshAreas.map((area) => (
-                      <option key={area} value={area}>{area}</option>
-                    ))}
-                  </select>
-                </div>
-                {registerForm.formState.errors.area && <p className="text-sm text-destructive">{registerForm.formState.errors.area.message}</p>}
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Creating Account...' : 'Create Account'}
-              </Button>
-            </form>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Creating Account...' : 'Create Account'}
+                </Button>
+              </form>
+            </Form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 text-center">
             <div className="text-sm text-muted-foreground">
@@ -201,4 +294,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-} 
+}

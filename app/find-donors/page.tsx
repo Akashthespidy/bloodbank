@@ -9,7 +9,22 @@ import Link from 'next/link';
 import { bloodGroups, bangladeshCities, bangladeshAreas } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const searchSchema = z.object({
   bloodGroup: z.string().optional(),
@@ -33,8 +48,13 @@ export default function FindDonorsPage() {
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const searchForm = useForm<SearchForm>({
+  const form = useForm<SearchForm>({
     resolver: zodResolver(searchSchema),
+    defaultValues: {
+      bloodGroup: '',
+      area: '',
+      city: '',
+    },
   });
 
   useEffect(() => {
@@ -69,12 +89,9 @@ export default function FindDonorsPage() {
     searchDonors(data);
   };
 
-  const getBloodGroupBadgeClass = (bloodGroup: string) => {
-    const group = bloodGroup.toLowerCase().replace('+', '-positive').replace('-', '-negative');
-    const base = "px-3 py-1 rounded-full text-sm font-bold shadow-sm";
-    if (group.includes('positive')) return `${base} bg-red-100 text-red-700 border border-red-200`;
-    if (group.includes('negative')) return `${base} bg-red-50 text-red-600 border border-red-200`;
-    return `${base} bg-gray-100 text-gray-700`;
+  const getBloodGroupVariant = (bloodGroup: string): "default" | "secondary" | "destructive" | "outline" => {
+    if (bloodGroup.includes('+')) return 'destructive';
+    return 'secondary';
   };
 
   return (
@@ -105,7 +122,7 @@ export default function FindDonorsPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Main Content */}
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -124,76 +141,105 @@ export default function FindDonorsPage() {
           {/* Search Form */}
           <Card className="max-w-4xl mx-auto mb-12">
             <CardContent className="pt-6">
-              <form onSubmit={searchForm.handleSubmit(handleSearch)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Blood Group
-                    </label>
-                    <div className="relative">
-                      <Droplets className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <select
-                        {...searchForm.register('bloodGroup')}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="">All Blood Groups</option>
-                        {bloodGroups.map((group) => (
-                          <option key={group} value={group}>
-                            {group}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSearch)} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="bloodGroup"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Blood Group</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="All Blood Groups" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="">All Blood Groups</SelectItem>
+                              {bloodGroups.map((group) => (
+                                <SelectItem key={group} value={group}>
+                                  <div className="flex items-center gap-2">
+                                    <Droplets className="h-4 w-4 text-primary" />
+                                    {group}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="All Cities" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="">All Cities</SelectItem>
+                              {bangladeshCities.map((city) => (
+                                <SelectItem key={city} value={city}>
+                                  <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 text-primary" />
+                                    {city}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="area"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Area</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="All Areas" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="">All Areas</SelectItem>
+                              {bangladeshAreas.map((area) => (
+                                <SelectItem key={area} value={area}>
+                                  <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 text-primary" />
+                                    {area}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      City
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <select
-                        {...searchForm.register('city')}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="">All Cities</option>
-                        {bangladeshCities.map((city) => (
-                          <option key={city} value={city}>
-                            {city}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="flex justify-center">
+                    <Button type="submit" disabled={loading} size="lg">
+                      <Search className="mr-2 h-5 w-5" />
+                      {loading ? 'Searching...' : 'Search Donors'}
+                    </Button>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Area
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <select
-                        {...searchForm.register('area')}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="">All Areas</option>
-                        {bangladeshAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center">
-                  <Button type="submit" disabled={loading} size="lg">
-                    <Search className="mr-2 h-5 w-5" />
-                    {loading ? 'Searching...' : 'Search Donors'}
-                  </Button>
-                </div>
-              </form>
+                </form>
+              </Form>
             </CardContent>
           </Card>
 
@@ -227,7 +273,7 @@ export default function FindDonorsPage() {
                     Try adjusting your search criteria or check back later for new donors.
                   </p>
                   <Button
-                    onClick={() => searchForm.reset()}
+                    onClick={() => form.reset()}
                     variant="outline"
                   >
                     Clear Filters
@@ -249,9 +295,9 @@ export default function FindDonorsPage() {
                             <p className="text-sm text-muted-foreground">Verified Donor</p>
                           </div>
                         </div>
-                        <span className={getBloodGroupBadgeClass(donor.blood_group)}>
+                        <Badge variant={getBloodGroupVariant(donor.blood_group)}>
                           {donor.blood_group}
-                        </span>
+                        </Badge>
                       </div>
 
                       <div className="space-y-3 mb-6">
@@ -342,5 +388,3 @@ export default function FindDonorsPage() {
     </div>
   );
 }
-
- 
