@@ -13,13 +13,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = loginSchema.parse(body);
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
     // Find user by email
-    const user = await db.get(
-      'SELECT id, email, password, name, blood_group, area, city FROM users WHERE email = ?',
-      [validatedData.email]
-    );
+    const user = db.prepare(
+      'SELECT id, email, password, name, blood_group, area, city FROM users WHERE email = ?'
+    ).get(validatedData.email) as any;
 
     if (!user) {
       return NextResponse.json(

@@ -8,12 +8,12 @@ export async function GET(request: NextRequest) {
     const area = searchParams.get('area');
     const city = searchParams.get('city');
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
     let query = `
       SELECT id, name, blood_group, area, city, created_at
       FROM users 
-      WHERE is_donor = true
+      WHERE is_donor = 1
     `;
     const params: any[] = [];
 
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     query += ' ORDER BY created_at DESC';
 
-    const donors = await db.all(query, params);
+    const donors = db.prepare(query).all(...params);
 
     return NextResponse.json({
       donors,

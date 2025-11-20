@@ -31,13 +31,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = contactRequestSchema.parse(body);
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
     // Get requester info
-    const requester = await db.get(
-      'SELECT id, name, email FROM users WHERE id = ?',
-      [decoded.userId]
-    );
+    const requester = db.prepare(
+      'SELECT id, name, email FROM users WHERE id = ?'
+    ).get(decoded.userId) as any;
 
     if (!requester) {
       return NextResponse.json(
@@ -47,10 +46,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get donor info
-    const donor = await db.get(
-      'SELECT id, name, email, blood_group, area FROM users WHERE id = ? AND is_donor = true',
-      [validatedData.donorId]
-    );
+    const donor = db.prepare(
+      'SELECT id, name, email, blood_group, area FROM users WHERE id = ? AND is_donor = 1'
+    ).get(validatedData.donorId) as any;
 
     if (!donor) {
       return NextResponse.json(
@@ -60,10 +58,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if request already exists
-    const existingRequest = await db.get(
-      'SELECT id FROM contact_requests WHERE requester_id = ? AND donor_id = ? AND status = "pending"',
-      [decoded.userId, validatedData.donorId]
-    );
+    const existingRequest = db.prepare(
+      'SELECT id FROM contact_requests WHERE requester_id = ? AND donor_id = ? AND status = "pending"'
+    ).get(decoded.userId, validatedData.donorId);
 
     if (existingRequest) {
       return NextResponse.json(
@@ -73,11 +70,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create contact request
-    const result = await db.run(
+    const result = db.prepare(
       `INSERT INTO contact_requests (requester_id, donor_id, message)
-       VALUES (?, ?, ?)`,
-      [decoded.userId, validatedData.donorId, validatedData.message || null]
-    );
+       VALUES (?, ?, ?)`
+    ).run(decoded.userId, validatedData.donorId, validatedData.message || null);
 
     // Send email to donor
     await sendContactRequestEmail(
@@ -90,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: 'Contact request sent successfully',
-      requestId: result.lastID
+      requestId: result.lastInsertRowid
     });
   } catch (error) {
     console.error('Contact request error:', error);

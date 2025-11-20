@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
     // Get contact requests for the authenticated user (as donor)
-    const requests = await db.all(`
+    const requests = db.prepare(`
       SELECT 
         cr.id,
         cr.status,
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       JOIN users u ON cr.requester_id = u.id
       WHERE cr.donor_id = ?
       ORDER BY cr.created_at DESC
-    `, [decoded.userId]);
+    `).all(decoded.userId);
 
     return NextResponse.json({
       requests,
@@ -85,13 +85,12 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
     // Update contact request status
-    const result = await db.run(
-      'UPDATE contact_requests SET status = ? WHERE id = ? AND donor_id = ?',
-      [status, requestId, decoded.userId]
-    );
+    const result = db.prepare(
+      'UPDATE contact_requests SET status = ? WHERE id = ? AND donor_id = ?'
+    ).run(status, requestId, decoded.userId);
 
     if (result.changes === 0) {
       return NextResponse.json(

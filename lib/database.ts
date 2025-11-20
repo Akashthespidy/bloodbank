@@ -1,21 +1,17 @@
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
+import Database from 'better-sqlite3';
 import path from 'path';
 
-let db: Database | null = null;
+let db: Database.Database | null = null;
 
-export async function getDatabase(): Promise<Database> {
+export function getDatabase() {
   if (db) {
     return db;
   }
 
-  db = await open({
-    filename: path.join(process.cwd(), 'bloodbank.db'),
-    driver: sqlite3.Database
-  });
+  db = new Database(path.join(process.cwd(), 'bloodbank.db'));
 
   // Create tables if they don't exist
-  await db.exec(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
@@ -44,9 +40,9 @@ export async function getDatabase(): Promise<Database> {
   return db;
 }
 
-export async function closeDatabase() {
+export function closeDatabase() {
   if (db) {
-    await db.close();
+    db.close();
     db = null;
   }
 } 

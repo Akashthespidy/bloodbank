@@ -6,6 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, Heart, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -48,141 +51,103 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Background Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
+    <div className="min-h-screen flex bg-background">
+      {/* Left Side - Hero Image */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-muted">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=2070&q=80')",
           }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-red-700/80 to-red-600/60"></div>
-          <div className="relative z-10 flex items-center justify-center h-full">
-            <div className="text-center text-white px-8 max-w-md">
-              <div className="blood-gradient h-24 w-24 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                <Heart className="h-12 w-12 text-white" />
-              </div>
-              <h1 className="heading-1 mb-6 leading-tight">
-                Welcome to Blood Bank BD
-              </h1>
-              <p className="body-text font-light mb-6">
-                Professional blood management system for Bangladesh
-              </p>
-              <p className="text-lg">
-                Access our secure platform to connect with verified blood donors
-              </p>
-            </div>
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-primary-foreground p-12 text-center">
+          <div className="bg-white/20 p-4 rounded-2xl mb-8 backdrop-blur-sm">
+            <Heart className="h-12 w-12 text-white fill-white" />
           </div>
+          <h1 className="font-display text-4xl font-bold mb-4">Welcome Back</h1>
+          <p className="text-lg text-white/90 max-w-md">
+            Access your professional dashboard to manage donations and connect with the community.
+          </p>
         </div>
       </div>
 
-      {/* Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-        <div className="max-w-md w-full space-y-10">
-          {/* Mobile Header */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="blood-gradient h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Heart className="h-10 w-10 text-white" />
-            </div>
-            <h2 className="heading-2 text-gray-900 mb-2">
-              Welcome Back
-            </h2>
-            <p className="body-text text-gray-600">
-              Sign in to your professional account
-            </p>
-          </div>
-
-          {/* Desktop Header */}
-          <div className="hidden lg:block text-center">
-            <h2 className="heading-2 text-gray-900 mb-2">
-              Welcome Back
-            </h2>
-            <p className="body-text text-gray-600">
-              Sign in to your professional account
-            </p>
-          </div>
-
-          <form
-            onSubmit={loginForm.handleSubmit(handleLogin)}
-            className="space-y-6"
-          >
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...loginForm.register('email')}
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="input-field pl-10"
-                />
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <Card className="w-full max-w-md border-none shadow-none">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
+            <CardDescription>
+              Enter your email and password to access your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="email">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    className="pl-10"
+                    {...loginForm.register('email')}
+                  />
+                </div>
+                {loginForm.formState.errors.email && (
+                  <p className="text-sm text-destructive">
+                    {loginForm.formState.errors.email.message}
+                  </p>
+                )}
               </div>
-              {loginForm.formState.errors.email && (
-                <p className="text-red-500 text-sm mt-2">
-                  {loginForm.formState.errors.email.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...loginForm.register('password')}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  className="input-field pl-10 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="password">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="pl-10 pr-10"
+                    {...loginForm.register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {loginForm.formState.errors.password && (
+                  <p className="text-sm text-destructive">
+                    {loginForm.formState.errors.password.message}
+                  </p>
+                )}
               </div>
-              {loginForm.formState.errors.password && (
-                <p className="text-red-500 text-sm mt-2">
-                  {loginForm.formState.errors.password.message}
-                </p>
-              )}
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full py-4 text-lg font-semibold"
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="text-center space-y-4">
-            <p className="text-sm text-gray-600">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4 text-center">
+            <div className="text-sm text-muted-foreground">
               Don't have an account?{' '}
-              <Link
-                href="/register"
-                className="text-red-600 hover:text-red-700 font-semibold transition"
-              >
+              <Link href="/register" className="text-primary hover:underline font-medium">
                 Register here
               </Link>
-            </p>
-
-            <Link
-              href="/"
-              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+            </div>
+            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" /> Back to Home
             </Link>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );

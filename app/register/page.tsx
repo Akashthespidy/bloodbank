@@ -7,6 +7,9 @@ import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Heart, ArrowLeft, Droplets } from 'lucide-react';
 import Link from 'next/link';
 import { bloodGroups, bangladeshCities, bangladeshAreas } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -52,251 +55,149 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Background Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
+    <div className="min-h-screen flex bg-background">
+      {/* Left Side - Hero Image */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-muted">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1576765607924-bf60b2f36b88?auto=format&fit=crop&w=2070&q=80')",
           }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-700/80 to-blue-600/60"></div>
-          <div className="relative z-10 flex items-center justify-center h-full">
-            <div className="text-center text-white px-8 max-w-md">
-              <div className="medical-gradient h-24 w-24 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                <Heart className="h-12 w-12 text-white" />
-              </div>
-              <h1 className="heading-1 mb-6 leading-tight">
-                Join Our Lifesaving Community
-              </h1>
-              <p className="body-text font-light mb-6">
-                Become a verified blood donor and help save lives
-              </p>
-              <p className="text-lg">
-                Your donation can make a difference in someone's life
-              </p>
-            </div>
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-700/90 to-blue-600/70" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-12 text-center">
+          <div className="bg-white/20 p-4 rounded-2xl mb-8 backdrop-blur-sm">
+            <Heart className="h-12 w-12 text-white fill-white" />
           </div>
+          <h1 className="font-display text-4xl font-bold mb-4">Join Our Community</h1>
+          <p className="text-lg text-white/90 max-w-md">
+            Become a part of the largest blood donor network in Bangladesh and help save lives.
+          </p>
         </div>
       </div>
 
-      {/* Registration Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-        <div className="max-w-md w-full space-y-8">
-          {/* Mobile Header */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="medical-gradient h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Heart className="h-10 w-10 text-white" />
-            </div>
-            <h2 className="heading-2 text-gray-900 mb-2">
-              Create Account
-            </h2>
-            <p className="body-text text-gray-600">
-              Join our professional blood donor network
-            </p>
-          </div>
-
-          {/* Desktop Header */}
-          <div className="hidden lg:block text-center">
-            <h2 className="heading-2 text-gray-900 mb-2">
-              Create Account
-            </h2>
-            <p className="body-text text-gray-600">
-              Join our professional blood donor network
-            </p>
-          </div>
-
-          <form
-            onSubmit={registerForm.handleSubmit(handleRegister)}
-            className="space-y-6"
-          >
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...registerForm.register('name')}
-                  type="text"
-                  placeholder="Enter your full name"
-                  className="input-field pl-10"
-                />
+      {/* Right Side - Register Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 overflow-y-auto">
+        <Card className="w-full max-w-md border-none shadow-none">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardDescription>
+              Enter your information to create your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none" htmlFor="name">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input id="name" placeholder="John Doe" className="pl-10" {...registerForm.register('name')} />
+                </div>
+                {registerForm.formState.errors.name && <p className="text-sm text-destructive">{registerForm.formState.errors.name.message}</p>}
               </div>
-              {registerForm.formState.errors.name && (
-                <p className="text-red-500 text-sm mt-2">
-                  {registerForm.formState.errors.name.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...registerForm.register('email')}
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="input-field pl-10"
-                />
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input id="email" type="email" placeholder="m@example.com" className="pl-10" {...registerForm.register('email')} />
+                </div>
+                {registerForm.formState.errors.email && <p className="text-sm text-destructive">{registerForm.formState.errors.email.message}</p>}
               </div>
-              {registerForm.formState.errors.email && (
-                <p className="text-red-500 text-sm mt-2">
-                  {registerForm.formState.errors.email.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...registerForm.register('password')}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a secure password"
-                  className="input-field pl-10 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none" htmlFor="password">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input id="password" type={showPassword ? 'text' : 'password'} className="pl-10 pr-10" {...registerForm.register('password')} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground">
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {registerForm.formState.errors.password && <p className="text-sm text-destructive">{registerForm.formState.errors.password.message}</p>}
               </div>
-              {registerForm.formState.errors.password && (
-                <p className="text-red-500 text-sm mt-2">
-                  {registerForm.formState.errors.password.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Phone Number (Optional)
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  {...registerForm.register('phone')}
-                  type="tel"
-                  placeholder="Enter your phone number"
-                  className="input-field pl-10"
-                />
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none" htmlFor="phone">Phone (Optional)</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input id="phone" type="tel" placeholder="+880..." className="pl-10" {...registerForm.register('phone')} />
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Blood Group
-              </label>
-              <div className="relative">
-                <Droplets className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <select
-                  {...registerForm.register('bloodGroup')}
-                  className="input-field pl-10"
-                >
-                  <option value="">Select your blood group</option>
-                  {bloodGroups.map((group) => (
-                    <option key={group} value={group}>
-                      {group}
-                    </option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none" htmlFor="bloodGroup">Blood Group</label>
+                  <div className="relative">
+                    <Droplets className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <select
+                      id="bloodGroup"
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
+                      {...registerForm.register('bloodGroup')}
+                    >
+                      <option value="">Select</option>
+                      {bloodGroups.map((group) => (
+                        <option key={group} value={group}>{group}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {registerForm.formState.errors.bloodGroup && <p className="text-sm text-destructive">{registerForm.formState.errors.bloodGroup.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none" htmlFor="city">City</label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <select
+                      id="city"
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
+                      {...registerForm.register('city')}
+                    >
+                      <option value="">Select</option>
+                      {bangladeshCities.map((city) => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {registerForm.formState.errors.city && <p className="text-sm text-destructive">{registerForm.formState.errors.city.message}</p>}
+                </div>
               </div>
-              {registerForm.formState.errors.bloodGroup && (
-                <p className="text-red-500 text-sm mt-2">
-                  {registerForm.formState.errors.bloodGroup.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                City
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <select
-                  {...registerForm.register('city')}
-                  className="input-field pl-10"
-                >
-                  <option value="">Select your city</option>
-                  {bangladeshCities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none" htmlFor="area">Area</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <select
+                    id="area"
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
+                    {...registerForm.register('area')}
+                  >
+                    <option value="">Select Area</option>
+                    {bangladeshAreas.map((area) => (
+                      <option key={area} value={area}>{area}</option>
+                    ))}
+                  </select>
+                </div>
+                {registerForm.formState.errors.area && <p className="text-sm text-destructive">{registerForm.formState.errors.area.message}</p>}
               </div>
-              {registerForm.formState.errors.city && (
-                <p className="text-red-500 text-sm mt-2">
-                  {registerForm.formState.errors.city.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Area
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <select
-                  {...registerForm.register('area')}
-                  className="input-field pl-10"
-                >
-                  <option value="">Select your area</option>
-                  {bangladeshAreas.map((area) => (
-                    <option key={area} value={area}>
-                      {area}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {registerForm.formState.errors.area && (
-                <p className="text-red-500 text-sm mt-2">
-                  {registerForm.formState.errors.area.message}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full py-4 text-lg font-semibold"
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="text-center space-y-4">
-            <p className="text-sm text-gray-600">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Creating Account...' : 'Create Account'}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4 text-center">
+            <div className="text-sm text-muted-foreground">
               Already have an account?{' '}
-              <Link
-                href="/login"
-                className="text-blue-600 hover:text-blue-700 font-semibold transition"
-              >
+              <Link href="/login" className="text-primary hover:underline font-medium">
                 Sign in here
               </Link>
-            </p>
-
-            <Link
-              href="/"
-              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+            </div>
+            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" /> Back to Home
             </Link>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );

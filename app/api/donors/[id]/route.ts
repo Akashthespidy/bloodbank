@@ -3,8 +3,9 @@ import { getDatabase } from '@/lib/database';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
+  const params = await props.params;
   try {
     const donorId = parseInt(params.id);
     
@@ -15,12 +16,11 @@ export async function GET(
       );
     }
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
-    const donor = await db.get(
-      'SELECT id, name, blood_group, area, city, created_at FROM users WHERE id = ? AND is_donor = true',
-      [donorId]
-    );
+    const donor = db.prepare(
+      'SELECT id, name, blood_group, area, city, created_at FROM users WHERE id = ? AND is_donor = 1'
+    ).get(donorId);
 
     if (!donor) {
       return NextResponse.json(

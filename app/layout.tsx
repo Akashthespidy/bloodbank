@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "Blood Bank Management System - Bangladesh",
@@ -14,10 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-        <div className="container mx-auto px-4 py-8">
-          {children}
-        </div>
+      <body className={`${inter.variable} ${outfit.variable} min-h-screen bg-background font-sans antialiased`}>
+        {children}
       </body>
     </html>
   );

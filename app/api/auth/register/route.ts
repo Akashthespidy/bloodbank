@@ -18,13 +18,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
 
-    const db = await getDatabase();
+    const db = getDatabase();
 
     // Check if user already exists
-    const existingUser = await db.get(
-      'SELECT id FROM users WHERE email = ?',
-      [validatedData.email]
-    );
+    const existingUser = db.prepare(
+      'SELECT id FROM users WHERE email = ?'
+    ).get(validatedData.email);
 
     if (existingUser) {
       return NextResponse.json(
@@ -37,24 +36,23 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(validatedData.password);
 
     // Insert new user
-    const result = await db.run(
+    const result = db.prepare(
       `INSERT INTO users (email, password, name, phone, blood_group, area, city)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        validatedData.email,
-        hashedPassword,
-        validatedData.name,
-        validatedData.phone || null,
-        validatedData.bloodGroup,
-        validatedData.area,
-        validatedData.city,
-      ]
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      validatedData.email,
+      hashedPassword,
+      validatedData.name,
+      validatedData.phone || null,
+      validatedData.bloodGroup,
+      validatedData.area,
+      validatedData.city
     );
 
     return NextResponse.json(
       { 
         message: 'User registered successfully',
-        userId: result.lastID 
+        userId: result.lastInsertRowid 
       },
       { status: 201 }
     );
