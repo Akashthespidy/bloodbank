@@ -1,75 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Search, UserPlus, ArrowRight, Activity, Users, Calendar, ShieldCheck } from 'lucide-react';
+import { Search, UserPlus, ArrowRight, Activity, Users, Calendar, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { GradientBars } from '@/components/ui/gradient-bars';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  blood_group: string;
-  area: string;
-  city: string;
-}
+import Header from '@/components/Header';
 
 export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 p-2 rounded-lg">
-              <Heart className="h-6 w-6 text-primary fill-primary" />
-            </div>
-            <span className="font-display text-xl font-bold tracking-tight">BloodBank BD</span>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <>
-                <span className="text-sm font-medium hidden md:inline-block">Hi, {user?.name}</span>
-                <Link href="/dashboard">
-                  <Button variant="outline" size="sm">Dashboard</Button>
-                </Link>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>Logout</Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">Login</Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm">Register</Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      {/* Animated Header */}
+      <Header />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-b from-red-50/50 to-background dark:from-red-950/20 dark:to-background">
@@ -89,12 +31,12 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/find-donors">
-                <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
-                  <Search className="mr-2 h-5 w-5" /> Find Donors
+                <Button variant="outline" size="lg" className="w-full font-bold sm:w-auto h-12 px-8 text-base">
+                  <UserPlus className="mr-2 h-5 w-5" /> Find Donors
                 </Button>
               </Link>
               <Link href="/register">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
+                <Button variant="outline" size="lg" className="w-full font-bold sm:w-auto h-12 px-8 text-base">
                   <UserPlus className="mr-2 h-5 w-5" /> Become a Donor
                 </Button>
               </Link>
@@ -188,7 +130,7 @@ export default function Home() {
             Join our community of donors today and be a hero in someone's story.
           </p>
           <Link href="/register">
-            <Button size="lg" variant="secondary" className="h-12 px-8 text-base font-bold">
+           <Button variant="outline" size="lg" className="w-full font-bold sm:w-auto h-12 px-8 text-base">
               Join Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
