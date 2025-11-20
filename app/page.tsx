@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Heart, Search, UserPlus, ArrowRight, Activity, Users, Calendar, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { GradientBars } from '@/components/ui/gradient-bars';
 
 interface User {
   id: number;
@@ -72,9 +73,12 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-b from-red-50/50 to-background dark:from-red-950/20 dark:to-background">
+        {/* Animated Gradient Bars Background */}
+        <GradientBars bars={20} colors={['hsl(var(--primary))', 'transparent']} />
+        
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary hover:bg-primary/20">
+            <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary hover:bg-primary/20">
               Save a Life Today
             </div>
             <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-foreground">
