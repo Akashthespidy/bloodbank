@@ -4,13 +4,21 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, MessageSquare, Heart, ArrowLeft, User, MapPin, Droplets, Calendar, Shield, Send } from 'lucide-react';
+import { Mail, MessageSquare, Heart, ArrowLeft, User, MapPin, Droplets, Calendar, Shield, Send, LogIn } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useAuth, useUser, SignInButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 const contactSchema = z.object({
+  hospital: z.string().min(3, 'Hospital name must be at least 3 characters'),
+  address: z.string().min(5, 'Address must be at least 5 characters'),
+  contact: z.string().min(10, 'Contact number must be at least 10 characters'),
+  time: z.string().min(1, 'Please specify the time'),
   message: z.string().min(10, 'Message must be at least 10 characters').max(500, 'Message must be less than 500 characters'),
 });
 
@@ -27,27 +35,20 @@ interface Donor {
 
 export default function ContactDonorPage() {
   const params = useParams();
+  const router = useRouter();
   const donorId = params.id as string;
+  const { isSignedIn, userId, getToken } = useAuth();
+  const { user } = useUser();
   
   const [donor, setDonor] = useState<Donor | null>(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
 
   const contactForm = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
-    }
-    
     fetchDonorDetails();
   }, [donorId]);
 
@@ -59,7 +60,7 @@ export default function ContactDonorPage() {
         setDonor(data.donor);
       } else {
         alert('Donor not found');
-        window.location.href = '/find-donors';
+        router.push('/find-donors');
       }
     } catch (error) {
       console.error('Error fetching donor details:', error);
@@ -68,15 +69,14 @@ export default function ContactDonorPage() {
   };
 
   const handleContactRequest = async (data: ContactForm) => {
-    if (!isAuthenticated) {
-      alert('Please login to contact donors');
-      window.location.href = '/login';
+    if (!isSignedIn) {
+      alert('Please sign in to contact donors');
       return;
     }
 
     setSending(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = await getToken();
       const response = await fetch('/api/contact-request', {
         method: 'POST',
         headers: {
@@ -85,13 +85,17 @@ export default function ContactDonorPage() {
         },
         body: JSON.stringify({
           donorId: parseInt(donorId),
+          hospital: data.hospital,
+          address: data.address,
+          contact: data.contact,
+          time: data.time,
           message: data.message,
         }),
       });
 
       if (response.ok) {
         alert('Contact request sent successfully! The donor will be notified via email.');
-        window.location.href = '/dashboard';
+        router.push('/find-donors');
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to send contact request');
@@ -113,251 +117,224 @@ export default function ContactDonorPage() {
 
   if (!donor) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20">
         <div className="text-center">
-          <div className="bg-primary/10 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Heart className="h-8 w-8 text-primary animate-pulse" />
-          </div>
-          <p className="text-muted-foreground">Loading donor details...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading donor information...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Professional Navigation */}
-      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-primary h-10 w-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                <Heart className="h-6 w-6 text-primary-foreground" />
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <Link
+          href="/find-donors"
+          className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Donors
+        </Link>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Donor Information Card */}
+          <Card className="bg-white border-none shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-primary/20 p-3 rounded-full">
+                    <User className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl text-black">{donor.name}</CardTitle>
+                    <CardDescription className="text-black/70">Blood Donor</CardDescription>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="text-xl font-bold text-foreground">Blood Bank BD</span>
-                <p className="text-xs text-muted-foreground">Professional Blood Management</p>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center space-x-3">
+                  <Droplets className="h-5 w-5 text-red-500" />
+                  <span className="text-sm font-medium text-black">Blood Group</span>
+                </div>
+                <span className={getBloodGroupBadgeClass(donor.bloodGroup)}>
+                  {donor.bloodGroup}
+                </span>
               </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <Link href="/find-donors">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Search
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
 
-      {/* Main Content */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="bg-primary/10 h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <Mail className="h-10 w-10 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-4">
-              Contact Blood Donor
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Send a secure contact request to connect with this donor
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Donor Information Card */}
-            <Card className="bg-white border-gray-200">
-              <CardContent className="pt-6">
-                <div className="text-center mb-6">
-                  <div className="bg-red-50 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
-                    <Heart className="h-8 w-8 text-red-600" />
-                  </div>
-                  <h2 className="text-2xl font-semibold text-black mb-2">{donor.name}</h2>
-                  <span className={`${getBloodGroupBadgeClass(donor.bloodGroup)} font-bold text-black`}>
-                    {donor.bloodGroup}
-                  </span>
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center space-x-3">
+                  <MapPin className="h-5 w-5 text-blue-500" />
+                  <span className="text-sm font-medium text-black">Location</span>
                 </div>
+                <span className="text-sm text-black font-semibold">{donor.area}, {donor.city}</span>
+              </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <MapPin className="h-5 w-5 text-gray-600" />
-                    <div>
-                      <p className="text-sm font-medium text-black">Location</p>
-                      <p className="text-sm text-gray-600">{donor.area}, {donor.city}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <Calendar className="h-5 w-5 text-gray-600" />
-                    <div>
-                      <p className="text-sm font-medium text-black">Member Since</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(donor.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-100">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div>
-                      <p className="text-sm font-medium text-green-900">Status</p>
-                      <p className="text-sm text-green-700">Available for Donation</p>
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center space-x-3">
+                  <Calendar className="h-5 w-5 text-green-500" />
+                  <span className="text-sm font-medium text-black">Member Since</span>
                 </div>
+                <span className="text-sm text-black font-semibold">
+                  {new Date(donor.createdAt).toLocaleDateString()}
+                </span>
+              </div>
 
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <div className="flex items-start space-x-3">
-                    <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-semibold text-blue-900 mb-1">Verified Donor</h4>
-                      <p className="text-sm text-blue-800">
-                        This donor has been verified and is part of our trusted network.
-                      </p>
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center space-x-3">
+                  <Shield className="h-5 w-5 text-purple-500" />
+                  <span className="text-sm font-medium text-black">Status</span>
                 </div>
-              </CardContent>
-            </Card>
+                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
+                  Available
+                </span>
+              </div>
+            </CardContent>
+          </Card>
 
-
-            {/* Contact Form */}
-            <Card className="bg-white border-gray-200">
-              <CardContent className="pt-6">
-                <div className="text-center mb-6">
-                  <div className="bg-blue-100 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <MessageSquare className="h-8 w-8 text-blue-600" />
+          {/* Contact Form Card */}
+          <Card className="bg-white border-none shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-black">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                <span>Send Blood Request</span>
+              </CardTitle>
+              <CardDescription className="text-black/70">
+                Fill in the details below to request blood from this donor
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!isSignedIn ? (
+                <div className="text-center py-8 space-y-4">
+                  <div className="bg-primary/10 p-4 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
+                    <LogIn className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold text-black mb-2">Send Contact Request</h3>
-                  <p className="text-gray-600">
-                    {isAuthenticated 
-                      ? 'Send a message to request contact with this donor'
-                      : 'Please login to send a contact request'
-                    }
+                  <h3 className="text-lg font-semibold text-black">Sign In Required</h3>
+                  <p className="text-sm text-black/70 max-w-sm mx-auto">
+                    You need to sign in to send blood requests to donors. This helps us maintain security and accountability.
                   </p>
+                  <SignInButton mode="modal">
+                    <Button className="w-full">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign In to Request Blood
+                    </Button>
+                  </SignInButton>
                 </div>
-
-                {isAuthenticated ? (
-                  <form onSubmit={contactForm.handleSubmit(handleContactRequest)} className="space-y-6">
+              ) : (
+                <form onSubmit={contactForm.handleSubmit(handleContactRequest)} className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Your Message
+                        Hospital Name *
                       </label>
-                      <textarea
-                        {...contactForm.register('message')}
-                        rows={6}
-                        placeholder="Please provide details about your blood requirement, urgency, and any specific information that would help the donor understand your situation..."
-                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black ring-offset-background placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      <Input
+                        {...contactForm.register('hospital')}
+                        placeholder="Enter hospital name"
+                        className="bg-white border-gray-300 text-black"
                       />
-                      {contactForm.formState.errors.message && (
-                        <p className="text-red-600 text-sm mt-2">
-                          {contactForm.formState.errors.message.message}
+                      {contactForm.formState.errors.hospital && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {contactForm.formState.errors.hospital.message}
                         </p>
                       )}
                     </div>
 
-                    <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        <Shield className="h-5 w-5 text-amber-600 mt-0.5" />
-                        <div>
-                          <h4 className="text-sm font-semibold text-amber-900 mb-1">Important Note</h4>
-                          <p className="text-sm text-amber-800">
-                            Your contact request will be sent to the donor via email. 
-                            They will review your request and respond accordingly.
-                          </p>
-                        </div>
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-2">
+                        Contact Number *
+                      </label>
+                      <Input
+                        {...contactForm.register('contact')}
+                        placeholder="Your contact number"
+                        className="bg-white border-gray-300 text-black"
+                      />
+                      {contactForm.formState.errors.contact && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {contactForm.formState.errors.contact.message}
+                        </p>
+                      )}
                     </div>
+                  </div>
 
-                    <Button
-                      type="submit"
-                      disabled={sending}
-                      className="w-full"
-                      size="lg"
-                    >
-                      <Send className="mr-2 h-5 w-5" />
-                      {sending ? 'Sending Request...' : 'Send Contact Request'}
-                    </Button>
-                  </form>
-                ) : (
-                  <div className="text-center space-y-6">
-                    <div className="bg-red-50 border border-red-100 rounded-lg p-6">
-                      <div className="flex items-center justify-center space-x-3 mb-4">
-                        <Shield className="h-8 w-8 text-red-600" />
-                        <h4 className="text-lg font-semibold text-red-900">Authentication Required</h4>
-                      </div>
-                      <p className="text-red-800 mb-6">
-                        You must be logged in to contact donors. This ensures security 
-                        and allows donors to review your profile before responding.
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Hospital Address *
+                    </label>
+                    <Input
+                      {...contactForm.register('address')}
+                      placeholder="Full hospital address"
+                      className="bg-white border-gray-300 text-black"
+                    />
+                    {contactForm.formState.errors.address && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {contactForm.formState.errors.address.message}
                       </p>
-                      <div className="space-y-3">
-                        <Link href="/login">
-                          <Button className="w-full">Login to Continue</Button>
-                        </Link>
-                        <Link href="/register">
-                          <Button variant="outline" className="w-full">Create Account</Button>
-                        </Link>
-                      </div>
-                    </div>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
 
-          {/* Information Section */}
-          <div className="mt-16">
-            <Card className="bg-gradient-to-r from-green-50/50 to-emerald-50/50 border-green-100">
-              <CardContent className="pt-8">
-                <div className="text-center mb-6">
-                  <div className="bg-green-100 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Heart className="h-8 w-8 text-green-600" />
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Required Time *
+                    </label>
+                    <Input
+                      {...contactForm.register('time')}
+                      type="datetime-local"
+                      className="bg-white border-gray-300 text-black"
+                    />
+                    {contactForm.formState.errors.time && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {contactForm.formState.errors.time.message}
+                      </p>
+                    )}
                   </div>
-                  <h3 className="text-xl font-semibold text-green-900 mb-2">How Contact Requests Work</h3>
-                  <p className="text-green-800">
-                    Our secure system ensures safe and professional communication
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Additional Message *
+                    </label>
+                    <Textarea
+                      {...contactForm.register('message')}
+                      placeholder="Provide any additional details about your request..."
+                      rows={4}
+                      className="bg-white border-gray-300 text-black resize-none"
+                    />
+                    {contactForm.formState.errors.message && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {contactForm.formState.errors.message.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={sending}
+                    className="w-full h-12 text-base font-semibold"
+                  >
+                    {sending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Sending Request...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Send Blood Request
+                      </>
+                    )}
+                  </Button>
+
+                  <p className="text-xs text-center text-black/60">
+                    The donor will receive your request via email with all the details you provided.
                   </p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="bg-green-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span className="text-green-600 font-bold">1</span>
-                    </div>
-                    <h4 className="font-semibold text-green-900 mb-2">Send Request</h4>
-                    <p className="text-sm text-green-800">
-                      Your message is sent securely to the donor via email
-                    </p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="bg-green-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span className="text-green-600 font-bold">2</span>
-                    </div>
-                    <h4 className="font-semibold text-green-900 mb-2">Donor Review</h4>
-                    <p className="text-sm text-green-800">
-                      Donor reviews your request and profile information
-                    </p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="bg-green-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span className="text-green-600 font-bold">3</span>
-                    </div>
-                    <h4 className="font-semibold text-green-900 mb-2">Get Response</h4>
-                    <p className="text-sm text-green-800">
-                      Donor responds with contact details or additional information
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </form>
+              )}
+            </CardContent>
+          </Card>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

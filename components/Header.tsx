@@ -24,7 +24,6 @@ interface User {
 
 const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
-  { name: 'Find Donors', href: '/find-donors' },
   { name: 'About', href: '/about' },
 ];
 

@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Heart, ArrowLeft, Droplets } from 'lucide-react';
 import Link from 'next/link';
-import { bloodGroups, bangladeshCities, bangladeshAreas } from '@/lib/utils';
+import { bloodGroups, bangladeshCities, getAreasForCity } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -41,6 +41,8 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -78,6 +80,13 @@ export default function RegisterPage() {
     }
   };
 
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    setAvailableAreas(getAreasForCity(city));
+    // Reset area selection when city changes
+    form.setValue('area', '');
+  };
+
   return (
     <div className="min-h-screen flex bg-background">
       {/* Left Side - Hero Image */}
@@ -104,9 +113,9 @@ export default function RegisterPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 overflow-y-auto">
         <Card className="w-full max-w-md border-none shadow-none my-8">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold">Become a Blood Donor</CardTitle>
             <CardDescription>
-              Enter your information to create your account
+              Register as a donor and help save lives. No login required!
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -222,7 +231,10 @@ export default function RegisterPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>City</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={(value) => {
+                          field.onChange(value);
+                          handleCityChange(value);
+                        }} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select" />
@@ -251,14 +263,14 @@ export default function RegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Area</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedCity}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select Area" />
+                            <SelectValue placeholder={selectedCity ? "Select Area" : "Select City First"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {bangladeshAreas.map((area) => (
+                          {availableAreas.map((area: string) => (
                             <SelectItem key={area} value={area}>
                               <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-primary" />

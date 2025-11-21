@@ -7,6 +7,10 @@ import { z } from 'zod';
 
 const contactRequestSchema = z.object({
   donorId: z.number(),
+  hospital: z.string().optional(),
+  address: z.string().optional(),
+  contact: z.string().optional(),
+  time: z.string().optional(),
   message: z.string().optional(),
 });
 
@@ -99,13 +103,20 @@ export async function POST(request: NextRequest) {
       })
       .returning({ id: contactRequests.id });
 
-    // Send email to donor
+    // Send email to donor with structured information
     await sendContactRequestEmail(
       donor.email,
       donor.name,
       requester.name,
       donor.bloodGroup,
-      donor.area
+      donor.area,
+      {
+        hospital: validatedData.hospital,
+        address: validatedData.address,
+        contact: validatedData.contact,
+        time: validatedData.time,
+        message: validatedData.message,
+      }
     );
 
     return NextResponse.json({

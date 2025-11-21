@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Search, Filter, MapPin, Droplets, Calendar, Phone, Mail, Heart, ArrowLeft, Users, Shield } from 'lucide-react';
+import { Search, Filter, MapPin, Droplets, Calendar, Phone, Mail, Heart, ArrowLeft, Users, Shield, Send } from 'lucide-react';
 import Link from 'next/link';
-import { bloodGroups, bangladeshCities, bangladeshAreas } from '@/lib/utils';
+import { bloodGroups, bangladeshCities, getAreasForCity } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +47,11 @@ export default function FindDonorsPage() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string>('all');
+  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+  const [showBulkMessage, setShowBulkMessage] = useState(false);
+  const [bulkMessage, setBulkMessage] = useState('');
+  const [sendingBulk, setSendingBulk] = useState(false);
 
   const form = useForm<SearchForm>({
     resolver: zodResolver(searchSchema),
@@ -92,6 +97,59 @@ export default function FindDonorsPage() {
   const getBloodGroupVariant = (bloodGroup: string): "default" | "secondary" | "destructive" | "outline" => {
     if (bloodGroup.includes('+')) return 'destructive';
     return 'secondary';
+  };
+
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    if (city === 'all') {
+      setAvailableAreas([]);
+    } else {
+      setAvailableAreas(getAreasForCity(city));
+    }
+    // Reset area selection when city changes
+    form.setValue('area', 'all');
+  };
+
+  const handleBulkMessage = async () => {
+    if (!bulkMessage.trim()) {
+      alert('Please enter a message');
+      return;
+    }
+
+    if (donors.length === 0) {
+      alert('No donors found to send message to');
+      return;
+    }
+
+    setSendingBulk(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/bulk-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          donorIds: donors.map(d => d.id),
+          message: bulkMessage,
+          bloodGroup: form.getValues('bloodGroup'),
+        }),
+      });
+
+      if (response.ok) {
+        alert(`Message sent successfully to ${donors.length} donor(s)!`);
+        setBulkMessage('');
+        setShowBulkMessage(false);
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to send bulk message');
+      }
+    } catch (error) {
+      alert('Failed to send bulk message');
+    } finally {
+      setSendingBulk(false);
+    }
   };
 
   return (
@@ -188,7 +246,10 @@ export default function FindDonorsPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-black font-semibold">City</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={(value) => {
+                            field.onChange(value);
+                            handleCityChange(value);
+                          }} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-white border-gray-300 text-black">
                                 <SelectValue placeholder="All Cities" />
@@ -225,7 +286,7 @@ export default function FindDonorsPage() {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="all">All Areas</SelectItem>
-                              {bangladeshAreas.map((area) => (
+                              {(selectedCity === 'all' ? [] : availableAreas).map((area: string) => (
                                 <SelectItem key={area} value={area}>
                                   <div className="flex items-center gap-2">
                                     <MapPin className="h-4 w-4 text-blue-600" />
@@ -254,15 +315,77 @@ export default function FindDonorsPage() {
 
           {/* Results Section */}
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <h2 className="text-2xl font-semibold text-foreground">
                 Available Donors ({donors.length})
               </h2>
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <Users className="h-5 w-5" />
-                <span className="text-sm font-medium">Verified Donors</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center space-x-2 text-muted-foreground">
+                  <Users className="h-5 w-5" />
+                  <span className="text-sm font-medium">Verified Donors</span>
+                </div>
+                {isAuthenticated && donors.length > 0 && (
+                  <Button 
+                    onClick={() => setShowBulkMessage(!showBulkMessage)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Message All ({donors.length})
+                  </Button>
+                )}
               </div>
             </div>
+
+            {/* Bulk Message Card */}
+            {showBulkMessage && isAuthenticated && (
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-blue-900 mb-1">
+                          Send Bulk Message
+                        </h3>
+                        <p className="text-sm text-blue-700">
+                          Send a message to all {donors.length} donor(s) matching your search criteria
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowBulkMessage(false)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <textarea
+                      value={bulkMessage}
+                      onChange={(e) => setBulkMessage(e.target.value)}
+                      rows={4}
+                      placeholder="Enter your message to all donors..."
+                      className="flex min-h-[80px] w-full rounded-md border border-blue-300 bg-white px-3 py-2 text-sm text-black ring-offset-background placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                    />
+                    <div className="flex justify-end gap-3">
+                      <Button
+                        onClick={() => setShowBulkMessage(false)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleBulkMessage}
+                        disabled={sendingBulk || !bulkMessage.trim()}
+                        size="sm"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        {sendingBulk ? 'Sending...' : `Send to ${donors.length} Donor(s)`}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {loading ? (
               <div className="text-center py-12">
