@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       bloodGroup: validatedData.bloodGroup,
       area: validatedData.area,
       city: validatedData.city,
+      isDonor: true,
     }).returning({ id: users.id });
 
     return NextResponse.json(

@@ -19,10 +19,10 @@ type ContactForm = z.infer<typeof contactSchema>;
 interface Donor {
   id: number;
   name: string;
-  blood_group: string;
+  bloodGroup: string;
   area: string;
   city: string;
-  created_at: string;
+  createdAt: string;
 }
 
 export default function ContactDonorPage() {
@@ -169,38 +169,38 @@ export default function ContactDonorPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Donor Information Card */}
-            <Card>
+            <Card className="bg-white border-gray-200">
               <CardContent className="pt-6">
                 <div className="text-center mb-6">
-                  <div className="bg-primary/10 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
-                    <Heart className="h-8 w-8 text-primary" />
+                  <div className="bg-red-50 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <Heart className="h-8 w-8 text-red-600" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-foreground mb-2">{donor.name}</h2>
-                  <span className={getBloodGroupBadgeClass(donor.blood_group)}>
-                    {donor.blood_group}
+                  <h2 className="text-2xl font-semibold text-black mb-2">{donor.name}</h2>
+                  <span className={`${getBloodGroupBadgeClass(donor.bloodGroup)} font-bold text-black`}>
+                    {donor.bloodGroup}
                   </span>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                    <MapPin className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <MapPin className="h-5 w-5 text-gray-600" />
                     <div>
-                      <p className="text-sm font-medium text-foreground">Location</p>
-                      <p className="text-sm text-muted-foreground">{donor.area}, {donor.city}</p>
+                      <p className="text-sm font-medium text-black">Location</p>
+                      <p className="text-sm text-gray-600">{donor.area}, {donor.city}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="h-5 w-5 text-gray-600" />
                     <div>
-                      <p className="text-sm font-medium text-foreground">Member Since</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(donor.created_at).toLocaleDateString()}
+                      <p className="text-sm font-medium text-black">Member Since</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(donor.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3 p-3 bg-green-50/50 rounded-lg border border-green-100">
+                  <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-100">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     <div>
                       <p className="text-sm font-medium text-green-900">Status</p>
@@ -209,7 +209,7 @@ export default function ContactDonorPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                   <div className="flex items-start space-x-3">
                     <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div>
@@ -223,15 +223,16 @@ export default function ContactDonorPage() {
               </CardContent>
             </Card>
 
+
             {/* Contact Form */}
-            <Card>
+            <Card className="bg-white border-gray-200">
               <CardContent className="pt-6">
                 <div className="text-center mb-6">
                   <div className="bg-blue-100 h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <MessageSquare className="h-8 w-8 text-blue-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Send Contact Request</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-xl font-semibold text-black mb-2">Send Contact Request</h3>
+                  <p className="text-gray-600">
                     {isAuthenticated 
                       ? 'Send a message to request contact with this donor'
                       : 'Please login to send a contact request'
@@ -242,23 +243,23 @@ export default function ContactDonorPage() {
                 {isAuthenticated ? (
                   <form onSubmit={contactForm.handleSubmit(handleContactRequest)} className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-sm font-medium text-black mb-2">
                         Your Message
                       </label>
                       <textarea
                         {...contactForm.register('message')}
                         rows={6}
                         placeholder="Please provide details about your blood requirement, urgency, and any specific information that would help the donor understand your situation..."
-                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-black ring-offset-background placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                       />
                       {contactForm.formState.errors.message && (
-                        <p className="text-destructive text-sm mt-2">
+                        <p className="text-red-600 text-sm mt-2">
                           {contactForm.formState.errors.message.message}
                         </p>
                       )}
                     </div>
 
-                    <div className="bg-amber-50/50 border border-amber-100 rounded-lg p-4">
+                    <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
                       <div className="flex items-start space-x-3">
                         <Shield className="h-5 w-5 text-amber-600 mt-0.5" />
                         <div>
@@ -283,7 +284,7 @@ export default function ContactDonorPage() {
                   </form>
                 ) : (
                   <div className="text-center space-y-6">
-                    <div className="bg-red-50/50 border border-red-100 rounded-lg p-6">
+                    <div className="bg-red-50 border border-red-100 rounded-lg p-6">
                       <div className="flex items-center justify-center space-x-3 mb-4">
                         <Shield className="h-8 w-8 text-red-600" />
                         <h4 className="text-lg font-semibold text-red-900">Authentication Required</h4>

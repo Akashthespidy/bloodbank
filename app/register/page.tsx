@@ -85,7 +85,7 @@ export default function RegisterPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1576765607924-bf60b2f36b88?auto=format&fit=crop&w=2070&q=80')",
+            backgroundImage: "url('/donor.webp')",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70" />

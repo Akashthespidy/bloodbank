@@ -157,6 +157,7 @@ async function seed() {
       await db.insert(users).values({
         ...donor,
         password: hashedPassword,
+        isDonor: true,
       });
       console.log(`✅ Inserted user: ${donor.name}`);
     } else {

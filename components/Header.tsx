@@ -17,7 +17,7 @@ interface User {
   id: number;
   name: string;
   email: string;
-  blood_group: string;
+  bloodGroup: string;
   area: string;
   city: string;
 }

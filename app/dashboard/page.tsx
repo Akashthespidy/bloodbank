@@ -10,7 +10,7 @@ interface User {
   id: number;
   name: string;
   email: string;
-  blood_group: string;
+  bloodGroup: string;
   area: string;
   city: string;
 }
@@ -19,7 +19,7 @@ interface ContactRequest {
   id: number;
   status: string;
   message: string;
-  created_at: string;
+  createdAt: string;
   requester_name: string;
   requester_email: string;
   requester_phone: string;
@@ -175,53 +175,53 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Card */}
             <div className="lg:col-span-1">
-              <Card>
+              <Card className="bg-[#800000] text-black border-none shadow-lg">
                 <CardContent className="pt-6">
                   <div className="text-center mb-6">
-                    <div className="bg-primary/10 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                      <User className="h-12 w-12 text-primary" />
+                    <div className="bg-white/20 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner backdrop-blur-sm">
+                      <User className="h-12 w-12 text-white" />
                     </div>
-                    <h2 className="text-2xl font-semibold text-foreground mb-2">{user.name}</h2>
-                    <span className={getBloodGroupBadgeClass(user.blood_group)}>
-                      {user.blood_group}
+                    <h2 className="text-2xl font-semibold text-white mb-2">{user.name}</h2>
+                    <span className={`${getBloodGroupBadgeClass(user.bloodGroup)} bg-white/90 text-black border-transparent`}>
+                      {user.bloodGroup}
                     </span>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                      <Mail className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm text-white">
+                      <Mail className="h-5 w-5 text-white/80" />
                       <div>
-                        <p className="text-sm font-medium text-foreground">Email</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="text-sm font-medium text-white/80">Email</p>
+                        <p className="text-sm text-white font-medium">{user.email}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                      <MapPin className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm text-white">
+                      <MapPin className="h-5 w-5 text-white/80" />
                       <div>
-                        <p className="text-sm font-medium text-foreground">Location</p>
-                        <p className="text-sm text-muted-foreground">{user.area}, {user.city}</p>
+                        <p className="text-sm font-medium text-white/80">Location</p>
+                        <p className="text-sm text-white font-medium">{user.area}, {user.city}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-3 p-3 bg-green-50/50 rounded-lg border border-green-100">
-                      <Shield className="h-5 w-5 text-green-600" />
+                    <div className="flex items-center space-x-3 p-3 bg-green-500/20 rounded-lg border border-green-500/30 backdrop-blur-sm">
+                      <Shield className="h-5 w-5 text-green-400" />
                       <div>
-                        <p className="text-sm font-medium text-green-900">Status</p>
-                        <p className="text-sm text-green-700">Verified Donor</p>
+                        <p className="text-sm font-medium text-green-300">Status</p>
+                        <p className="text-sm text-green-100 font-medium">Verified Donor</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-6 space-y-3">
                     <Link href="/find-donors">
-                      <Button className="w-full">
+                      <Button className="w-full bg-white text-[#800000] hover:bg-gray-100">
                         <Users className="h-4 w-4 mr-2" />
                         Find Donors
                       </Button>
                     </Link>
                     <Link href="/">
-                      <Button variant="outline" className="w-full">
+                      <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white">
                         Back to Home
                       </Button>
                     </Link>
@@ -301,7 +301,7 @@ export default function DashboardPage() {
                             )}
                             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                               <Calendar className="h-4 w-4" />
-                              <span>Requested: {new Date(request.created_at).toLocaleDateString()}</span>
+                              <span>Requested: {new Date(request.createdAt).toLocaleDateString()}</span>
                             </div>
                           </div>
 

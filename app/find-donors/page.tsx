@@ -37,10 +37,10 @@ type SearchForm = z.infer<typeof searchSchema>;
 interface Donor {
   id: number;
   name: string;
-  blood_group: string;
+  bloodGroup: string;
   area: string;
   city: string;
-  created_at: string;
+  createdAt: string;
 }
 
 export default function FindDonorsPage() {
@@ -95,7 +95,16 @@ export default function FindDonorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Background Image with Overlay */}
+      <div className="fixed inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/find-donor.png')" }}
+        />
+        <div className="absolute inset-0 bg-background/90 backdrop-blur-[2px]" />
+      </div>
+      
       {/* Professional Navigation */}
       <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,7 +132,7 @@ export default function FindDonorsPage() {
       </nav>
 
       {/* Main Content */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8">
+      <section className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="bg-primary/10 h-20 w-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
@@ -139,7 +148,7 @@ export default function FindDonorsPage() {
           </div>
 
           {/* Search Form */}
-          <Card className="max-w-4xl mx-auto mb-12">
+          <Card className="max-w-4xl mx-auto mb-12 bg-white border-gray-200">
             <CardContent className="pt-6">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSearch)} className="space-y-6">
@@ -149,10 +158,10 @@ export default function FindDonorsPage() {
                       name="bloodGroup"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Blood Group</FormLabel>
+                          <FormLabel className="text-black font-semibold">Blood Group</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="bg-white border-gray-300 text-black">
                                 <SelectValue placeholder="All Blood Groups" />
                               </SelectTrigger>
                             </FormControl>
@@ -161,7 +170,7 @@ export default function FindDonorsPage() {
                               {bloodGroups.map((group) => (
                                 <SelectItem key={group} value={group}>
                                   <div className="flex items-center gap-2">
-                                    <Droplets className="h-4 w-4 text-primary" />
+                                    <Droplets className="h-4 w-4 text-red-600" />
                                     {group}
                                   </div>
                                 </SelectItem>
@@ -178,10 +187,10 @@ export default function FindDonorsPage() {
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>City</FormLabel>
+                          <FormLabel className="text-black font-semibold">City</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="bg-white border-gray-300 text-black">
                                 <SelectValue placeholder="All Cities" />
                               </SelectTrigger>
                             </FormControl>
@@ -190,7 +199,7 @@ export default function FindDonorsPage() {
                               {bangladeshCities.map((city) => (
                                 <SelectItem key={city} value={city}>
                                   <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-primary" />
+                                    <MapPin className="h-4 w-4 text-blue-600" />
                                     {city}
                                   </div>
                                 </SelectItem>
@@ -207,10 +216,10 @@ export default function FindDonorsPage() {
                       name="area"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Area</FormLabel>
+                          <FormLabel className="text-black font-semibold">Area</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="bg-white border-gray-300 text-black">
                                 <SelectValue placeholder="All Areas" />
                               </SelectTrigger>
                             </FormControl>
@@ -219,7 +228,7 @@ export default function FindDonorsPage() {
                               {bangladeshAreas.map((area) => (
                                 <SelectItem key={area} value={area}>
                                   <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-primary" />
+                                    <MapPin className="h-4 w-4 text-blue-600" />
                                     {area}
                                   </div>
                                 </SelectItem>
@@ -283,31 +292,31 @@ export default function FindDonorsPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {donors.map((donor) => (
-                  <Card key={donor.id} className="group hover:shadow-lg transition-all duration-300">
+                  <Card key={donor.id} className="group hover:shadow-lg transition-all duration-300 bg-white border-gray-200">
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
-                          <div className="bg-primary/10 h-12 w-12 rounded-xl flex items-center justify-center shadow-inner">
-                            <Heart className="h-6 w-6 text-primary" />
+                          <div className="bg-red-50 h-12 w-12 rounded-xl flex items-center justify-center shadow-inner">
+                            <Heart className="h-6 w-6 text-red-600" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-foreground">{donor.name}</h3>
-                            <p className="text-sm text-muted-foreground">Verified Donor</p>
+                            <h3 className="font-semibold text-black">{donor.name}</h3>
+                            <p className="text-sm text-gray-600">Verified Donor</p>
                           </div>
                         </div>
-                        <Badge variant={getBloodGroupVariant(donor.blood_group)}>
-                          {donor.blood_group}
+                        <Badge variant={getBloodGroupVariant(donor.bloodGroup)} className="font-bold text-base px-3 py-1">
+                          {donor.bloodGroup}
                         </Badge>
                       </div>
 
                       <div className="space-y-3 mb-6">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4 mr-2 text-muted-foreground/70" />
+                        <div className="flex items-center text-sm text-black">
+                          <MapPin className="h-4 w-4 mr-2 text-gray-600" />
                           <span>{donor.area}, {donor.city}</span>
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4 mr-2 text-muted-foreground/70" />
-                          <span>Joined {new Date(donor.created_at).toLocaleDateString()}</span>
+                        <div className="flex items-center text-sm text-black">
+                          <Calendar className="h-4 w-4 mr-2 text-gray-600" />
+                          <span>Joined {new Date(donor.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>
 
