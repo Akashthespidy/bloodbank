@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Animated Header */}
-      <Header />
+
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-b from-red-50/50 to-background dark:from-red-950/20 dark:to-background">
