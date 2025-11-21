@@ -1,15 +1,13 @@
 'use client';
 
+import { useAuth } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ArrowLeft,
   Calendar,
   Droplets,
-  Filter,
   Heart,
-  Mail,
   MapPin,
-  Phone,
   Search,
   Send,
   Shield,
@@ -24,10 +22,6 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   Form,
@@ -66,7 +60,7 @@ interface Donor {
 export default function FindDonorsPage() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isSignedIn, getToken } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   const [showBulkMessage, setShowBulkMessage] = useState(false);
@@ -83,10 +77,6 @@ export default function FindDonorsPage() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
     searchDonors();
   }, []);
 
@@ -146,7 +136,7 @@ export default function FindDonorsPage() {
 
     setSendingBulk(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = await getToken();
       const response = await fetch('/api/bulk-message', {
         method: 'POST',
         headers: {
@@ -352,7 +342,7 @@ export default function FindDonorsPage() {
                   <Users className="h-5 w-5" />
                   <span className="text-sm font-medium">Verified Donors</span>
                 </div>
-                {isAuthenticated && donors.length > 0 && (
+                {isSignedIn && donors.length > 0 && (
                   <Button
                     onClick={() => setShowBulkMessage(!showBulkMessage)}
                     variant="outline"
@@ -366,7 +356,7 @@ export default function FindDonorsPage() {
             </div>
 
             {/* Bulk Message Card */}
-            {showBulkMessage && isAuthenticated && (
+            {showBulkMessage && isSignedIn && (
               <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
                 <CardContent className="pt-6">
                   <div className="space-y-4">
@@ -474,7 +464,7 @@ export default function FindDonorsPage() {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        {isAuthenticated ? (
+                        {isSignedIn ? (
                           <Link href={`/contact-donor/${donor.id}`}>
                             <Button size="sm">Contact Donor</Button>
                           </Link>
