@@ -46,7 +46,6 @@ import { bangladeshCities, bloodGroups, getAreasForCity } from '@/lib/utils';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().optional(),
   bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
@@ -57,7 +56,6 @@ const registerSchema = z.object({
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
@@ -67,7 +65,6 @@ export default function RegisterPage() {
     defaultValues: {
       name: '',
       email: '',
-      password: '',
       phone: '',
       bloodGroup: 'A+',
       area: '',
@@ -85,8 +82,8 @@ export default function RegisterPage() {
       });
 
       if (response.ok) {
-        alert('Registration successful! Please login with your credentials.');
-        window.location.href = '/login';
+        alert('Registration successful! You are now listed as a donor.');
+        window.location.href = '/';
       } else {
         const error = await response.json();
         alert(error.error || 'Registration failed. Please try again.');
@@ -171,38 +168,6 @@ export default function RegisterPage() {
                             className="pl-10"
                             {...field}
                           />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                          <Input
-                            type={showPassword ? 'text' : 'password'}
-                            className="pl-10 pr-10"
-                            {...field}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-5 w-5" />
-                            ) : (
-                              <Eye className="h-5 w-5" />
-                            )}
-                          </button>
                         </div>
                       </FormControl>
                       <FormMessage />

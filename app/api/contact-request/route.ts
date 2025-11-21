@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
         .values({
           email,
           name,
-          password: 'clerk-auth-user', // Dummy password
           bloodGroup: 'Unknown', // Placeholder
           area: 'Unknown', // Placeholder
           city: 'Unknown', // Placeholder

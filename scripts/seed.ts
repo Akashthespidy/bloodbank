@@ -149,10 +149,10 @@ async function seed() {
     const existingUser = await db.select().from(users).where(eq(users.email, donor.email)).limit(1);
 
     if (existingUser.length === 0) {
-      const hashedPassword = await hashPassword(donor.password);
+      // Remove password from donor object before inserting
+      const { password, ...donorData } = donor;
       await db.insert(users).values({
-        ...donor,
-        password: hashedPassword,
+        ...donorData,
         isDonor: true,
       });
       console.log(`✅ Inserted user: ${donor.name}`);

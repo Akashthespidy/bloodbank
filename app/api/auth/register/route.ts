@@ -7,7 +7,6 @@ import { users } from '@/lib/schema';
 
 const registerSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
   name: z.string().min(2),
   phone: z.string().optional(),
   bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
@@ -30,15 +29,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
     }
 
-    // Hash password
-    const hashedPassword = await hashPassword(validatedData.password);
-
     // Insert new user
     const result = await db
       .insert(users)
       .values({
         email: validatedData.email,
-        password: hashedPassword,
         name: validatedData.name,
         phone: validatedData.phone || null,
         bloodGroup: validatedData.bloodGroup,

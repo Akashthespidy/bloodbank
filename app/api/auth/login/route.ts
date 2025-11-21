@@ -1,58 +1,8 @@
-import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { generateToken, verifyPassword } from '@/lib/auth';
-import { db } from '@/lib/database';
-import { users } from '@/lib/schema';
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const validatedData = loginSchema.parse(body);
-
-    const userResult = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, validatedData.email))
-      .limit(1);
-
-    const user = userResult[0];
-
-    if (!user) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
-    }
-
-    // Verify password
-    const isValidPassword = await verifyPassword(validatedData.password, user.password);
-
-    if (!isValidPassword) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
-    }
-
-    // Generate token
-    const token = generateToken(user.id);
-
-    // Return user data (without password) and token
-    const { password, ...userWithoutPassword } = user;
-
-    return NextResponse.json({
-      user: userWithoutPassword,
-      token,
-      message: 'Login successful',
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid input data', details: error.errors },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+  return NextResponse.json(
+    { error: 'This login endpoint is deprecated. Please use Clerk authentication.' },
+    { status: 410 }
+  );
 }
