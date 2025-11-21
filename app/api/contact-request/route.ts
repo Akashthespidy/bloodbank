@@ -1,7 +1,8 @@
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { sendContactRequestEmail, verifyToken } from '@/lib/auth';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { sendContactRequestEmail } from '@/lib/auth';
 import { db } from '@/lib/database';
 import { contactRequests, users } from '@/lib/schema';
 
@@ -16,31 +17,47 @@ const contactRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Verify Clerk authentication
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    // Get Clerk user details
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    const name = clerkUser.firstName ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() : email?.split('@')[0] || 'User';
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email not found' }, { status: 400 });
     }
 
     const body = await request.json();
     const validatedData = contactRequestSchema.parse(body);
 
-    // Get requester info
-    const requesterResult = await db
-      .select({ id: users.id, name: users.name, email: users.email })
-      .from(users)
-      .where(eq(users.id, decoded.userId))
-      .limit(1);
-    const requester = requesterResult[0];
+    // Check if requester exists in local DB, if not create one
+    let requesterId: number;
+    const existingRequester = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-    if (!requester) {
-      return NextResponse.json({ error: 'Requester not found' }, { status: 404 });
+    if (existingRequester.length > 0) {
+      requesterId = existingRequester[0].id;
+    } else {
+      // Create a new user record for the requester (non-donor by default)
+      // We need to provide dummy values for required fields since this is just a requester
+      const newUser = await db
+        .insert(users)
+        .values({
+          email,
+          name,
+          password: 'clerk-auth-user', // Dummy password
+          bloodGroup: 'Unknown', // Placeholder
+          area: 'Unknown', // Placeholder
+          city: 'Unknown', // Placeholder
+          isDonor: false,
+        })
+        .returning({ id: users.id });
+      requesterId = newUser[0].id;
     }
 
     // Get donor info
@@ -67,7 +84,7 @@ export async function POST(request: NextRequest) {
       .from(contactRequests)
       .where(
         and(
-          eq(contactRequests.requesterId, decoded.userId),
+          eq(contactRequests.requesterId, requesterId),
           eq(contactRequests.donorId, validatedData.donorId),
           eq(contactRequests.status, 'pending')
         )
@@ -82,7 +99,7 @@ export async function POST(request: NextRequest) {
     const result = await db
       .insert(contactRequests)
       .values({
-        requesterId: decoded.userId,
+        requesterId: requesterId,
         donorId: validatedData.donorId,
         message: validatedData.message || null,
       })
@@ -92,7 +109,7 @@ export async function POST(request: NextRequest) {
     await sendContactRequestEmail(
       donor.email,
       donor.name,
-      requester.name,
+      name,
       donor.bloodGroup,
       donor.area,
       {
