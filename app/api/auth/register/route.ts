@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { db } from '@/lib/database';
+import { users } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/lib/auth';
 import { z } from 'zod';
 
@@ -18,14 +20,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
 
-    const db = getDatabase();
+    const existingUser = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, validatedData.email))
+      .limit(1);
 
-    // Check if user already exists
-    const existingUser = db.prepare(
-      'SELECT id FROM users WHERE email = ?'
-    ).get(validatedData.email);
-
-    if (existingUser) {
+    if (existingUser.length > 0) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 400 }
@@ -36,23 +37,20 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(validatedData.password);
 
     // Insert new user
-    const result = db.prepare(
-      `INSERT INTO users (email, password, name, phone, blood_group, area, city)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    ).run(
-      validatedData.email,
-      hashedPassword,
-      validatedData.name,
-      validatedData.phone || null,
-      validatedData.bloodGroup,
-      validatedData.area,
-      validatedData.city
-    );
+    const result = await db.insert(users).values({
+      email: validatedData.email,
+      password: hashedPassword,
+      name: validatedData.name,
+      phone: validatedData.phone || null,
+      bloodGroup: validatedData.bloodGroup,
+      area: validatedData.area,
+      city: validatedData.city,
+    }).returning({ id: users.id });
 
     return NextResponse.json(
       { 
         message: 'User registered successfully',
-        userId: result.lastInsertRowid 
+        userId: result[0].id 
       },
       { status: 201 }
     );

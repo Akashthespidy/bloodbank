@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { db } from '@/lib/database';
+import { users } from '@/lib/schema';
+import { eq, and, desc } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,33 +10,32 @@ export async function GET(request: NextRequest) {
     const area = searchParams.get('area');
     const city = searchParams.get('city');
 
-    const db = getDatabase();
-
-    let query = `
-      SELECT id, name, blood_group, area, city, created_at
-      FROM users 
-      WHERE is_donor = 1
-    `;
-    const params: any[] = [];
+    const conditions = [eq(users.isDonor, true)];
 
     if (bloodGroup) {
-      query += ' AND blood_group = ?';
-      params.push(bloodGroup);
+      conditions.push(eq(users.bloodGroup, bloodGroup));
     }
 
     if (area) {
-      query += ' AND area = ?';
-      params.push(area);
+      conditions.push(eq(users.area, area));
     }
 
     if (city) {
-      query += ' AND city = ?';
-      params.push(city);
+      conditions.push(eq(users.city, city));
     }
 
-    query += ' ORDER BY created_at DESC';
-
-    const donors = db.prepare(query).all(...params);
+    const donors = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        bloodGroup: users.bloodGroup,
+        area: users.area,
+        city: users.city,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(and(...conditions))
+      .orderBy(desc(users.createdAt));
 
     return NextResponse.json({
       donors,

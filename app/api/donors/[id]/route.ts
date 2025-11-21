@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { db } from '@/lib/database';
+import { users } from '@/lib/schema';
+import { eq, and } from 'drizzle-orm';
 
 export async function GET(
   request: NextRequest,
@@ -16,11 +18,20 @@ export async function GET(
       );
     }
 
-    const db = getDatabase();
+    const donorResult = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        bloodGroup: users.bloodGroup,
+        area: users.area,
+        city: users.city,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(and(eq(users.id, donorId), eq(users.isDonor, true)))
+      .limit(1);
 
-    const donor = db.prepare(
-      'SELECT id, name, blood_group, area, city, created_at FROM users WHERE id = ? AND is_donor = 1'
-    ).get(donorId);
+    const donor = donorResult[0];
 
     if (!donor) {
       return NextResponse.json(

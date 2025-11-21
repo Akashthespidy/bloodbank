@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { db } from '@/lib/database';
+import { contactRequests, users } from '@/lib/schema';
+import { eq, desc, and } from 'drizzle-orm';
 import { verifyToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -22,25 +24,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const db = getDatabase();
+
 
     // Get contact requests for the authenticated user (as donor)
-    const requests = db.prepare(`
-      SELECT 
-        cr.id,
-        cr.status,
-        cr.message,
-        cr.created_at,
-        u.name as requester_name,
-        u.email as requester_email,
-        u.phone as requester_phone,
-        u.blood_group as requester_blood_group,
-        u.area as requester_area
-      FROM contact_requests cr
-      JOIN users u ON cr.requester_id = u.id
-      WHERE cr.donor_id = ?
-      ORDER BY cr.created_at DESC
-    `).all(decoded.userId);
+    const requests = await db
+      .select({
+        id: contactRequests.id,
+        status: contactRequests.status,
+        message: contactRequests.message,
+        createdAt: contactRequests.createdAt,
+        requester_name: users.name,
+        requester_email: users.email,
+        requester_phone: users.phone,
+        requester_blood_group: users.bloodGroup,
+        requester_area: users.area,
+      })
+      .from(contactRequests)
+      .innerJoin(users, eq(contactRequests.requesterId, users.id))
+      .where(eq(contactRequests.donorId, decoded.userId))
+      .orderBy(desc(contactRequests.createdAt));
 
     return NextResponse.json({
       requests,
@@ -85,14 +87,21 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const db = getDatabase();
+
 
     // Update contact request status
-    const result = db.prepare(
-      'UPDATE contact_requests SET status = ? WHERE id = ? AND donor_id = ?'
-    ).run(status, requestId, decoded.userId);
+    const result = await db
+      .update(contactRequests)
+      .set({ status })
+      .where(
+        and(
+          eq(contactRequests.id, requestId),
+          eq(contactRequests.donorId, decoded.userId)
+        )
+      )
+      .returning({ id: contactRequests.id });
 
-    if (result.changes === 0) {
+    if (result.length === 0) {
       return NextResponse.json(
         { error: 'Contact request not found or unauthorized' },
         { status: 404 }

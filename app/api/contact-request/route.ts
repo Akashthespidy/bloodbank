@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { db } from '@/lib/database';
+import { contactRequests, users } from '@/lib/schema';
+import { eq, and } from 'drizzle-orm';
 import { verifyToken, sendContactRequestEmail } from '@/lib/auth';
 import { z } from 'zod';
 
@@ -31,12 +33,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = contactRequestSchema.parse(body);
 
-    const db = getDatabase();
-
     // Get requester info
-    const requester = db.prepare(
-      'SELECT id, name, email FROM users WHERE id = ?'
-    ).get(decoded.userId) as any;
+    const requesterResult = await db
+      .select({ id: users.id, name: users.name, email: users.email })
+      .from(users)
+      .where(eq(users.id, decoded.userId))
+      .limit(1);
+    const requester = requesterResult[0];
 
     if (!requester) {
       return NextResponse.json(
@@ -46,9 +49,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Get donor info
-    const donor = db.prepare(
-      'SELECT id, name, email, blood_group, area FROM users WHERE id = ? AND is_donor = 1'
-    ).get(validatedData.donorId) as any;
+    const donorResult = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        bloodGroup: users.bloodGroup,
+        area: users.area,
+      })
+      .from(users)
+      .where(and(eq(users.id, validatedData.donorId), eq(users.isDonor, true)))
+      .limit(1);
+    const donor = donorResult[0];
 
     if (!donor) {
       return NextResponse.json(
@@ -58,11 +70,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if request already exists
-    const existingRequest = db.prepare(
-      'SELECT id FROM contact_requests WHERE requester_id = ? AND donor_id = ? AND status = "pending"'
-    ).get(decoded.userId, validatedData.donorId);
+    const existingRequest = await db
+      .select({ id: contactRequests.id })
+      .from(contactRequests)
+      .where(
+        and(
+          eq(contactRequests.requesterId, decoded.userId),
+          eq(contactRequests.donorId, validatedData.donorId),
+          eq(contactRequests.status, 'pending')
+        )
+      )
+      .limit(1);
 
-    if (existingRequest) {
+    if (existingRequest.length > 0) {
       return NextResponse.json(
         { error: 'Contact request already sent' },
         { status: 400 }
@@ -70,23 +90,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Create contact request
-    const result = db.prepare(
-      `INSERT INTO contact_requests (requester_id, donor_id, message)
-       VALUES (?, ?, ?)`
-    ).run(decoded.userId, validatedData.donorId, validatedData.message || null);
+    const result = await db
+      .insert(contactRequests)
+      .values({
+        requesterId: decoded.userId,
+        donorId: validatedData.donorId,
+        message: validatedData.message || null,
+      })
+      .returning({ id: contactRequests.id });
 
     // Send email to donor
     await sendContactRequestEmail(
       donor.email,
       donor.name,
       requester.name,
-      donor.blood_group,
+      donor.bloodGroup,
       donor.area
     );
 
     return NextResponse.json({
       message: 'Contact request sent successfully',
-      requestId: result.lastInsertRowid
+      requestId: result[0].id
     });
   } catch (error) {
     console.error('Contact request error:', error);

@@ -177,6 +177,15 @@ export default function Header() {
                 )}
               </div>
             ))}
+            {isAuthenticated && (
+              <Link
+                prefetch={false}
+                href="/dashboard"
+                className="text-foreground flex items-center space-x-1 font-medium transition-colors duration-200 hover:text-primary"
+              >
+                <span>Dashboard</span>
+              </Link>
+            )}
           </nav>
 
           {/* Desktop Auth Buttons */}
@@ -188,13 +197,7 @@ export default function Header() {
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">{user?.name}</span>
                   </div>
-                  <Link
-                    prefetch={false}
-                    href="/dashboard"
-                    className="text-foreground font-medium transition-colors duration-200 hover:text-primary"
-                  >
-                    Dashboard
-                  </Link>
+
                   <button
                     onClick={handleLogout}
                     className="text-foreground font-medium transition-colors duration-200 hover:text-primary"

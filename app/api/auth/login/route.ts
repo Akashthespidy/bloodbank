@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { db } from '@/lib/database';
+import { users } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 import { verifyPassword, generateToken } from '@/lib/auth';
 import { z } from 'zod';
 
@@ -13,12 +15,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = loginSchema.parse(body);
 
-    const db = getDatabase();
+    const userResult = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, validatedData.email))
+      .limit(1);
 
-    // Find user by email
-    const user = db.prepare(
-      'SELECT id, email, password, name, blood_group, area, city FROM users WHERE email = ?'
-    ).get(validatedData.email) as any;
+    const user = userResult[0];
 
     if (!user) {
       return NextResponse.json(
