@@ -1,25 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { SignInButton, useAuth, useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Mail, MessageSquare, Heart, ArrowLeft, User, MapPin, Droplets, Calendar, Shield, Send, LogIn } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  Droplets,
+  Heart,
+  LogIn,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Send,
+  Shield,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useAuth, useUser, SignInButton } from '@clerk/nextjs';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const contactSchema = z.object({
   hospital: z.string().min(3, 'Hospital name must be at least 3 characters'),
   address: z.string().min(5, 'Address must be at least 5 characters'),
   contact: z.string().min(10, 'Contact number must be at least 10 characters'),
   time: z.string().min(1, 'Please specify the time'),
-  message: z.string().min(10, 'Message must be at least 10 characters').max(500, 'Message must be less than 500 characters'),
+  message: z
+    .string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(500, 'Message must be less than 500 characters'),
 });
 
 type ContactForm = z.infer<typeof contactSchema>;
@@ -39,7 +61,7 @@ export default function ContactDonorPage() {
   const donorId = params.id as string;
   const { isSignedIn, userId, getToken } = useAuth();
   const { user } = useUser();
-  
+
   const [donor, setDonor] = useState<Donor | null>(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -109,7 +131,7 @@ export default function ContactDonorPage() {
 
   const getBloodGroupBadgeClass = (bloodGroup: string) => {
     const group = bloodGroup.toLowerCase().replace('+', '-positive').replace('-', '-negative');
-    const base = "px-3 py-1 rounded-full text-sm font-bold shadow-sm";
+    const base = 'px-3 py-1 rounded-full text-sm font-bold shadow-sm';
     if (group.includes('positive')) return `${base} bg-red-100 text-red-700 border border-red-200`;
     if (group.includes('negative')) return `${base} bg-red-50 text-red-600 border border-red-200`;
     return `${base} bg-gray-100 text-gray-700`;
@@ -170,7 +192,9 @@ export default function ContactDonorPage() {
                   <MapPin className="h-5 w-5 text-blue-500" />
                   <span className="text-sm font-medium text-black">Location</span>
                 </div>
-                <span className="text-sm text-black font-semibold">{donor.area}, {donor.city}</span>
+                <span className="text-sm text-black font-semibold">
+                  {donor.area}, {donor.city}
+                </span>
               </div>
 
               <div className="flex items-center justify-between py-3 border-b">
@@ -214,7 +238,8 @@ export default function ContactDonorPage() {
                   </div>
                   <h3 className="text-lg font-semibold text-black">Sign In Required</h3>
                   <p className="text-sm text-black/70 max-w-sm mx-auto">
-                    You need to sign in to send blood requests to donors. This helps us maintain security and accountability.
+                    You need to sign in to send blood requests to donors. This helps us maintain
+                    security and accountability.
                   </p>
                   <SignInButton mode="modal">
                     <Button className="w-full">
@@ -224,7 +249,10 @@ export default function ContactDonorPage() {
                   </SignInButton>
                 </div>
               ) : (
-                <form onSubmit={contactForm.handleSubmit(handleContactRequest)} className="space-y-5">
+                <form
+                  onSubmit={contactForm.handleSubmit(handleContactRequest)}
+                  className="space-y-5"
+                >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">

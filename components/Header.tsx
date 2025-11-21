@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, ArrowRight, Heart, User } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, ChevronDown, Heart, Menu, User, X } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
+import React, { useEffect, useState } from 'react';
 
 interface NavItem {
   name: string;
@@ -65,8 +65,7 @@ export default function Header() {
     animate: { y: 0, opacity: 1 },
     scrolled: {
       backdropFilter: 'blur(20px)',
-      backgroundColor:
-        theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+      backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
     },
   };
@@ -106,11 +105,7 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <Link
-              prefetch={false}
-              href="/"
-              className="flex items-center space-x-2"
-            >
+            <Link prefetch={false} href="/" className="flex items-center space-x-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
                 <Heart className="h-6 w-6 text-white fill-white" />
               </div>
@@ -126,9 +121,7 @@ export default function Header() {
               <div
                 key={item.name}
                 className="relative"
-                onMouseEnter={() =>
-                  item.hasDropdown && setActiveDropdown(item.name)
-                }
+                onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.name)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <Link
@@ -160,9 +153,7 @@ export default function Header() {
                             href={dropdownItem.href}
                             className="hover:bg-muted block px-4 py-3 transition-colors duration-200"
                           >
-                            <div className="text-foreground font-medium">
-                              {dropdownItem.name}
-                            </div>
+                            <div className="text-foreground font-medium">{dropdownItem.name}</div>
                             {dropdownItem.description && (
                               <div className="text-muted-foreground text-sm">
                                 {dropdownItem.description}
@@ -234,11 +225,7 @@ export default function Header() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             whileTap={{ scale: 0.95 }}
           >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </motion.button>
         </div>
 

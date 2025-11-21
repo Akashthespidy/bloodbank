@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication with Clerk
     const { userId } = await auth();
-    
+
     if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized. Please sign in to send messages.' },
@@ -18,23 +18,17 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!donorIds || !Array.isArray(donorIds) || donorIds.length === 0) {
-      return NextResponse.json(
-        { error: 'No donors selected' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No donors selected' }, { status: 400 });
     }
 
     if (!message || message.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Message cannot be empty' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Message cannot be empty' }, { status: 400 });
     }
 
     // TODO: Implement actual email sending logic
     // This is a placeholder that you should replace with your email service
     // Example using nodemailer or your preferred email service:
-    
+
     /*
     const db = await getDatabase();
     const donors = await db.all(
@@ -66,9 +60,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Message queued for ${donorIds.length} donor(s)`,
-      donorCount: donorIds.length
+      donorCount: donorIds.length,
     });
-
   } catch (error) {
     console.error('Bulk message error:', error);
     return NextResponse.json(

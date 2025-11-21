@@ -1,9 +1,9 @@
+import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { sendContactRequestEmail, verifyToken } from '@/lib/auth';
 import { db } from '@/lib/database';
 import { contactRequests, users } from '@/lib/schema';
-import { eq, and } from 'drizzle-orm';
-import { verifyToken, sendContactRequestEmail } from '@/lib/auth';
-import { z } from 'zod';
 
 const contactRequestSchema = z.object({
   donorId: z.number(),
@@ -19,19 +19,13 @@ export async function POST(request: NextRequest) {
     // Verify authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const token = authHeader.substring(7);
     const decoded = verifyToken(token);
     if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -46,10 +40,7 @@ export async function POST(request: NextRequest) {
     const requester = requesterResult[0];
 
     if (!requester) {
-      return NextResponse.json(
-        { error: 'Requester not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Requester not found' }, { status: 404 });
     }
 
     // Get donor info
@@ -67,10 +58,7 @@ export async function POST(request: NextRequest) {
     const donor = donorResult[0];
 
     if (!donor) {
-      return NextResponse.json(
-        { error: 'Donor not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Donor not found' }, { status: 404 });
     }
 
     // Check if request already exists
@@ -87,10 +75,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (existingRequest.length > 0) {
-      return NextResponse.json(
-        { error: 'Contact request already sent' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Contact request already sent' }, { status: 400 });
     }
 
     // Create contact request
@@ -121,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: 'Contact request sent successfully',
-      requestId: result[0].id
+      requestId: result[0].id,
     });
   } catch (error) {
     console.error('Contact request error:', error);
@@ -131,9 +116,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

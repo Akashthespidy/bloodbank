@@ -1,23 +1,24 @@
-import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import type { Metadata } from 'next';
+import { Inter, Outfit } from 'next/font/google';
+import './globals.css';
 import {
   ClerkProvider,
-  SignInButton,
-  SignUpButton,
   SignedIn,
   SignedOut,
+  SignInButton,
+  SignUpButton,
   UserButton,
 } from '@clerk/nextjs';
+import { ThemeProvider } from '@/components/theme-provider';
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
-  title: "Blood Bank Management System - Bangladesh",
-  description: "Find blood donors in Bangladesh. Search by blood group, area, or city. Connect with donors safely and securely.",
-  keywords: "blood bank, blood donation, Bangladesh, donors, emergency, healthcare",
+  title: 'Blood Bank Management System - Bangladesh',
+  description:
+    'Find blood donors in Bangladesh. Search by blood group, area, or city. Connect with donors safely and securely.',
+  keywords: 'blood bank, blood donation, Bangladesh, donors, emergency, healthcare',
 };
 
 export default function RootLayout({
@@ -28,7 +29,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${inter.variable} ${outfit.variable} min-h-screen bg-background font-sans antialiased`}>
+        <body
+          className={`${inter.variable} ${outfit.variable} min-h-screen bg-background font-sans antialiased`}
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -42,8 +45,12 @@ export default function RootLayout({
                   <div className="flex items-center">
                     <a href="/" className="flex items-center space-x-2">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
-                        <svg className="h-6 w-6 text-white fill-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        <svg
+                          className="h-6 w-6 text-white fill-white"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                         </svg>
                       </div>
                       <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-xl font-bold text-transparent">
@@ -67,23 +74,23 @@ export default function RootLayout({
                       </SignUpButton>
                     </SignedOut>
                     <SignedIn>
-                      <UserButton 
+                      <UserButton
                         afterSignOutUrl="/"
                         appearance={{
                           elements: {
-                            avatarBox: "h-10 w-10",
-                            userButtonPopoverCard: "shadow-xl",
-                            userButtonPopoverActionButton: "hover:bg-muted"
-                          }
+                            avatarBox: 'h-10 w-10',
+                            userButtonPopoverCard: 'shadow-xl',
+                            userButtonPopoverActionButton: 'hover:bg-muted',
+                          },
                         }}
                         userProfileMode="modal"
                         userProfileProps={{
                           appearance: {
                             elements: {
-                              rootBox: "w-full",
-                              card: "shadow-xl"
-                            }
-                          }
+                              rootBox: 'w-full',
+                              card: 'shadow-xl',
+                            },
+                          },
                         }}
                       />
                     </SignedIn>

@@ -19,7 +19,7 @@ export const GradientBars = ({
           const position = index / (bars - 1);
           const center = 0.5;
           const distance = Math.abs(position - center);
-          const scale = 0.3 + 0.7 * Math.pow(distance * 2, 1.2);
+          const scale = 0.3 + 0.7 * (distance * 2) ** 1.2;
 
           return (
             <motion.div

@@ -1,14 +1,20 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Eye, EyeOff, Heart, Lock, Mail } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, Heart, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -16,7 +22,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -69,7 +76,8 @@ export default function LoginPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=2070&q=80')",
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=2070&q=80')",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70" />
@@ -89,9 +97,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md border-none shadow-none">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-            <CardDescription>
-              Enter your email and password to access your account
-            </CardDescription>
+            <CardDescription>Enter your email and password to access your account</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -137,7 +143,11 @@ export default function LoginPage() {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                           >
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
                           </button>
                         </div>
                       </FormControl>
@@ -159,7 +169,10 @@ export default function LoginPage() {
                 Register here
               </Link>
             </div>
-            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2">
+            <Link
+              href="/"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" /> Back to Home
             </Link>
           </CardFooter>

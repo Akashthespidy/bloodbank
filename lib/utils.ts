@@ -1,68 +1,180 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as const;
 
 export const bangladeshCities = [
-  'Dhaka', 'Chittagong', 'Sylhet', 'Rajshahi', 'Khulna', 'Barisal', 
-  'Rangpur', 'Mymensingh', 'Comilla', 'Gazipur', 'Narayanganj', 'Bogra'
+  'Dhaka',
+  'Chittagong',
+  'Sylhet',
+  'Rajshahi',
+  'Khulna',
+  'Barisal',
+  'Rangpur',
+  'Mymensingh',
+  'Comilla',
+  'Gazipur',
+  'Narayanganj',
+  'Bogra',
 ] as const;
 
 // Comprehensive city-to-area mapping
 export const cityAreaMapping: Record<string, string[]> = {
-  'Dhaka': [
-    'Dhanmondi', 'Gulshan', 'Banani', 'Mirpur', 'Uttara', 'Mohammadpur',
-    'Badda', 'Rampura', 'Motijheel', 'Tejgaon', 'Farmgate', 'Kawran Bazar',
-    'Bashundhara', 'Khilgaon', 'Malibagh', 'Shantinagar', 'Paltan', 'Segunbagicha'
+  Dhaka: [
+    'Dhanmondi',
+    'Gulshan',
+    'Banani',
+    'Mirpur',
+    'Uttara',
+    'Mohammadpur',
+    'Badda',
+    'Rampura',
+    'Motijheel',
+    'Tejgaon',
+    'Farmgate',
+    'Kawran Bazar',
+    'Bashundhara',
+    'Khilgaon',
+    'Malibagh',
+    'Shantinagar',
+    'Paltan',
+    'Segunbagicha',
   ],
-  'Chittagong': [
-    'Agrabad', 'Panchlaish', 'Khulshi', 'Halishahar', 'Nasirabad', 'Chawkbazar',
-    'Pahartali', 'Bayazid', 'GEC Circle', 'Muradpur', 'Oxygen', 'Sholoshahar'
+  Chittagong: [
+    'Agrabad',
+    'Panchlaish',
+    'Khulshi',
+    'Halishahar',
+    'Nasirabad',
+    'Chawkbazar',
+    'Pahartali',
+    'Bayazid',
+    'GEC Circle',
+    'Muradpur',
+    'Oxygen',
+    'Sholoshahar',
   ],
-  'Sylhet': [
-    'Zindabazar', 'Ambarkhana', 'Bandar Bazar', 'Uposhohor', 'Mirer Maydan',
-    'Chowhatta', 'Kumarpara', 'Tilagarh', 'Shahjalal Uposhohor', 'Pathantula'
+  Sylhet: [
+    'Zindabazar',
+    'Ambarkhana',
+    'Bandar Bazar',
+    'Uposhohor',
+    'Mirer Maydan',
+    'Chowhatta',
+    'Kumarpara',
+    'Tilagarh',
+    'Shahjalal Uposhohor',
+    'Pathantula',
   ],
-  'Rajshahi': [
-    'Shaheb Bazar', 'Boalia', 'Motihar', 'Rajpara', 'Kazla', 'Binodpur',
-    'Talaimari', 'Sapura', 'Uposhohor', 'Court Station'
+  Rajshahi: [
+    'Shaheb Bazar',
+    'Boalia',
+    'Motihar',
+    'Rajpara',
+    'Kazla',
+    'Binodpur',
+    'Talaimari',
+    'Sapura',
+    'Uposhohor',
+    'Court Station',
   ],
-  'Khulna': [
-    'Sonadanga', 'Khalishpur', 'Daulatpur', 'Khan Jahan Ali', 'Boyra',
-    'Nirala', 'Shibbari', 'Rupsha', 'Gallamari', 'Tutpara'
+  Khulna: [
+    'Sonadanga',
+    'Khalishpur',
+    'Daulatpur',
+    'Khan Jahan Ali',
+    'Boyra',
+    'Nirala',
+    'Shibbari',
+    'Rupsha',
+    'Gallamari',
+    'Tutpara',
   ],
-  'Barisal': [
-    'Nathullabad', 'Sagordi', 'Band Road', 'Kashipur', 'Rupatoli',
-    'Chawk Bazar', 'Fazlul Haque Avenue', 'Kawnia', 'Amtola', 'Bagura Road'
+  Barisal: [
+    'Nathullabad',
+    'Sagordi',
+    'Band Road',
+    'Kashipur',
+    'Rupatoli',
+    'Chawk Bazar',
+    'Fazlul Haque Avenue',
+    'Kawnia',
+    'Amtola',
+    'Bagura Road',
   ],
-  'Rangpur': [
-    'Jahaj Company More', 'Dhap', 'Satmatha', 'Station Road', 'Lalbagh',
-    'Mahiganj', 'Munshipara', 'Shapla Chattar', 'Tajhat', 'Modern More'
+  Rangpur: [
+    'Jahaj Company More',
+    'Dhap',
+    'Satmatha',
+    'Station Road',
+    'Lalbagh',
+    'Mahiganj',
+    'Munshipara',
+    'Shapla Chattar',
+    'Tajhat',
+    'Modern More',
   ],
-  'Mymensingh': [
-    'Charpara', 'Kachari', 'Ganginarpar', 'Akua', 'Mashkanda',
-    'Town Hall', 'Shombhuganj', 'Kewatkhali', 'Taltola', 'Boro Bazar'
+  Mymensingh: [
+    'Charpara',
+    'Kachari',
+    'Ganginarpar',
+    'Akua',
+    'Mashkanda',
+    'Town Hall',
+    'Shombhuganj',
+    'Kewatkhali',
+    'Taltola',
+    'Boro Bazar',
   ],
-  'Comilla': [
-    'Kandirpar', 'Laksam Road', 'Tomsom Bridge', 'Dharmasagar',
-    'Ranir Bazar', 'Kotbari', 'Chawk Bazar', 'Jail Road', 'Biponi Bitan'
+  Comilla: [
+    'Kandirpar',
+    'Laksam Road',
+    'Tomsom Bridge',
+    'Dharmasagar',
+    'Ranir Bazar',
+    'Kotbari',
+    'Chawk Bazar',
+    'Jail Road',
+    'Biponi Bitan',
   ],
-  'Gazipur': [
-    'Tongi', 'Joydebpur', 'Kaliakair', 'Kapasia', 'Board Bazar',
-    'Chandna', 'Mouchak', 'Rajendrapur', 'Bhawal Mirzapur'
+  Gazipur: [
+    'Tongi',
+    'Joydebpur',
+    'Kaliakair',
+    'Kapasia',
+    'Board Bazar',
+    'Chandna',
+    'Mouchak',
+    'Rajendrapur',
+    'Bhawal Mirzapur',
   ],
-  'Narayanganj': [
-    'Chashara', 'Fatullah', 'Siddhirganj', 'Bandar', 'Kadam Rasul',
-    'Madanganj', 'Gopaldi', 'Khanpur', 'Signboard'
+  Narayanganj: [
+    'Chashara',
+    'Fatullah',
+    'Siddhirganj',
+    'Bandar',
+    'Kadam Rasul',
+    'Madanganj',
+    'Gopaldi',
+    'Khanpur',
+    'Signboard',
   ],
-  'Bogra': [
-    'Satmatha', 'Thanthania', 'Nawab Bari Road', 'Rangpur Road', 'Sherpur Road',
-    'Khamar Para', 'Borogola', 'Kalitola', 'Shahid Chowrasta', 'Jail Road'
-  ]
+  Bogra: [
+    'Satmatha',
+    'Thanthania',
+    'Nawab Bari Road',
+    'Rangpur Road',
+    'Sherpur Road',
+    'Khamar Para',
+    'Borogola',
+    'Kalitola',
+    'Shahid Chowrasta',
+    'Jail Road',
+  ],
 };
 
 // Get all unique areas from all cities
@@ -72,4 +184,3 @@ export const bangladeshAreas = Object.values(cityAreaMapping).flat();
 export function getAreasForCity(city: string): string[] {
   return cityAreaMapping[city] || [];
 }
-

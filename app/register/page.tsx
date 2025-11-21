@@ -1,15 +1,31 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  ArrowLeft,
+  Droplets,
+  Eye,
+  EyeOff,
+  Heart,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+} from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Heart, ArrowLeft, Droplets } from 'lucide-react';
-import Link from 'next/link';
-import { bloodGroups, bangladeshCities, getAreasForCity } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -17,14 +33,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
+import { bangladeshCities, bloodGroups, getAreasForCity } from '@/lib/utils';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -147,7 +165,12 @@ export default function RegisterPage() {
                       <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                          <Input type="email" placeholder="m@example.com" className="pl-10" {...field} />
+                          <Input
+                            type="email"
+                            placeholder="m@example.com"
+                            className="pl-10"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -164,13 +187,21 @@ export default function RegisterPage() {
                       <FormControl>
                         <div className="relative">
                           <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                          <Input type={showPassword ? 'text' : 'password'} className="pl-10 pr-10" {...field} />
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            className="pl-10 pr-10"
+                            {...field}
+                          />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                           >
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
                           </button>
                         </div>
                       </FormControl>
@@ -231,10 +262,13 @@ export default function RegisterPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>City</FormLabel>
-                        <Select onValueChange={(value) => {
-                          field.onChange(value);
-                          handleCityChange(value);
-                        }} defaultValue={field.value}>
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            handleCityChange(value);
+                          }}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select" />
@@ -263,10 +297,16 @@ export default function RegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Area</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedCity}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!selectedCity}
+                      >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder={selectedCity ? "Select Area" : "Select City First"} />
+                            <SelectValue
+                              placeholder={selectedCity ? 'Select Area' : 'Select City First'}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -298,7 +338,10 @@ export default function RegisterPage() {
                 Sign in here
               </Link>
             </div>
-            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2">
+            <Link
+              href="/"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" /> Back to Home
             </Link>
           </CardFooter>

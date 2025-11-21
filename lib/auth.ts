@@ -29,8 +29,8 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER || 'your-email@gmail.com',
-    pass: process.env.EMAIL_PASS || 'your-app-password'
-  }
+    pass: process.env.EMAIL_PASS || 'your-app-password',
+  },
 });
 
 export async function sendContactRequestEmail(
@@ -93,7 +93,9 @@ export async function sendContactRequestEmail(
                   ${area}
                 </td>
               </tr>
-              ${contactData?.hospital ? `
+              ${
+                contactData?.hospital
+                  ? `
               <tr>
                 <td style="padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
                   <strong style="color: #374151;">Hospital:</strong>
@@ -102,8 +104,12 @@ export async function sendContactRequestEmail(
                   ${contactData.hospital}
                 </td>
               </tr>
-              ` : ''}
-              ${contactData?.address ? `
+              `
+                  : ''
+              }
+              ${
+                contactData?.address
+                  ? `
               <tr>
                 <td style="padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
                   <strong style="color: #374151;">Hospital Address:</strong>
@@ -112,8 +118,12 @@ export async function sendContactRequestEmail(
                   ${contactData.address}
                 </td>
               </tr>
-              ` : ''}
-              ${contactData?.contact ? `
+              `
+                  : ''
+              }
+              ${
+                contactData?.contact
+                  ? `
               <tr>
                 <td style="padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
                   <strong style="color: #374151;">Contact Number:</strong>
@@ -124,8 +134,12 @@ export async function sendContactRequestEmail(
                   </a>
                 </td>
               </tr>
-              ` : ''}
-              ${contactData?.time ? `
+              `
+                  : ''
+              }
+              ${
+                contactData?.time
+                  ? `
               <tr>
                 <td style="padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
                   <strong style="color: #374151;">Required Time:</strong>
@@ -134,15 +148,21 @@ export async function sendContactRequestEmail(
                   ${new Date(contactData.time).toLocaleString()}
                 </td>
               </tr>
-              ` : ''}
+              `
+                  : ''
+              }
             </table>
             
-            ${contactData?.message ? `
+            ${
+              contactData?.message
+                ? `
             <div style="margin-top: 20px; padding: 15px; background-color: #f9fafb; border-radius: 6px;">
               <strong style="color: #374151; display: block; margin-bottom: 8px;">Additional Message:</strong>
               <p style="color: #6b7280; margin: 0; line-height: 1.6;">${contactData.message}</p>
             </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
           
           <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; margin: 20px 0;">
@@ -162,7 +182,7 @@ export async function sendContactRequestEmail(
           <p style="margin: 5px 0 0 0;">Please do not reply to this email.</p>
         </div>
       </div>
-    `
+    `,
   };
 
   try {
@@ -170,4 +190,4 @@ export async function sendContactRequestEmail(
   } catch (error) {
     console.error('Email sending failed:', error);
   }
-} 
+}

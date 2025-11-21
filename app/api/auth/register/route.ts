@@ -1,9 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { hashPassword } from '@/lib/auth';
 import { db } from '@/lib/database';
 import { users } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
-import { hashPassword } from '@/lib/auth';
-import { z } from 'zod';
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -27,31 +27,31 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (existingUser.length > 0) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
     }
 
     // Hash password
     const hashedPassword = await hashPassword(validatedData.password);
 
     // Insert new user
-    const result = await db.insert(users).values({
-      email: validatedData.email,
-      password: hashedPassword,
-      name: validatedData.name,
-      phone: validatedData.phone || null,
-      bloodGroup: validatedData.bloodGroup,
-      area: validatedData.area,
-      city: validatedData.city,
-      isDonor: true,
-    }).returning({ id: users.id });
+    const result = await db
+      .insert(users)
+      .values({
+        email: validatedData.email,
+        password: hashedPassword,
+        name: validatedData.name,
+        phone: validatedData.phone || null,
+        bloodGroup: validatedData.bloodGroup,
+        area: validatedData.area,
+        city: validatedData.city,
+        isDonor: true,
+      })
+      .returning({ id: users.id });
 
     return NextResponse.json(
-      { 
+      {
         message: 'User registered successfully',
-        userId: result[0].id 
+        userId: result[0].id,
       },
       { status: 201 }
     );
@@ -63,9 +63,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

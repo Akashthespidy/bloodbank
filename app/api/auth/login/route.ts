@@ -1,9 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { generateToken, verifyPassword } from '@/lib/auth';
 import { db } from '@/lib/database';
 import { users } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
-import { verifyPassword, generateToken } from '@/lib/auth';
-import { z } from 'zod';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -24,20 +24,14 @@ export async function POST(request: NextRequest) {
     const user = userResult[0];
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     // Verify password
     const isValidPassword = await verifyPassword(validatedData.password, user.password);
 
     if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     // Generate token
@@ -49,7 +43,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       user: userWithoutPassword,
       token,
-      message: 'Login successful'
+      message: 'Login successful',
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -59,9 +53,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

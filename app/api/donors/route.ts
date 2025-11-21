@@ -1,7 +1,7 @@
+import { and, desc, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/database';
 import { users } from '@/lib/schema';
-import { eq, and, desc } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,13 +39,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       donors,
-      count: donors.length
+      count: donors.length,
     });
   } catch (error) {
     console.error('Donors search error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

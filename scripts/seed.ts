@@ -1,8 +1,8 @@
 import 'dotenv/config';
+import { eq } from 'drizzle-orm';
+import { hashPassword } from '../lib/auth';
 import { db } from '../lib/database';
 import { users } from '../lib/schema';
-import { hashPassword } from '../lib/auth';
-import { eq } from 'drizzle-orm';
 
 const dummyDonors = [
   {
@@ -146,11 +146,7 @@ async function seed() {
   console.log('🌱 Seeding database...');
 
   for (const donor of dummyDonors) {
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, donor.email))
-      .limit(1);
+    const existingUser = await db.select().from(users).where(eq(users.email, donor.email)).limit(1);
 
     if (existingUser.length === 0) {
       const hashedPassword = await hashPassword(donor.password);

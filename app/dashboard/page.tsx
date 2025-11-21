@@ -1,10 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Heart, User, Mail, Phone, MapPin, Calendar, LogOut, Settings, Bell, Shield, Users, Clock, CheckCircle, XCircle, Droplets } from 'lucide-react';
+import {
+  Bell,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Droplets,
+  Heart,
+  LogOut,
+  Mail,
+  MapPin,
+  Phone,
+  Settings,
+  Shield,
+  User,
+  Users,
+  XCircle,
+} from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface User {
   id: number;
@@ -35,7 +58,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
+
     if (!token || !userData) {
       window.location.href = '/login';
       return;
@@ -51,7 +74,7 @@ export default function DashboardPage() {
       const response = await fetch('/api/contact-requests', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setContactRequests(data.requests);
@@ -63,7 +86,10 @@ export default function DashboardPage() {
     }
   };
 
-  const handleContactRequestResponse = async (requestId: number, status: 'approved' | 'rejected') => {
+  const handleContactRequestResponse = async (
+    requestId: number,
+    status: 'approved' | 'rejected'
+  ) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/contact-requests', {
@@ -95,14 +121,14 @@ export default function DashboardPage() {
   const getBloodGroupBadgeClass = (bloodGroup: string) => {
     const group = bloodGroup.toLowerCase().replace('+', '-positive').replace('-', '-negative');
     // Mapping to tailwind classes for badges
-    const base = "px-3 py-1 rounded-full text-sm font-bold shadow-sm";
+    const base = 'px-3 py-1 rounded-full text-sm font-bold shadow-sm';
     if (group.includes('positive')) return `${base} bg-red-100 text-red-700 border border-red-200`;
     if (group.includes('negative')) return `${base} bg-red-50 text-red-600 border border-red-200`;
     return `${base} bg-gray-100 text-gray-700`;
   };
 
   const getStatusBadgeClass = (status: string) => {
-    const base = "px-3 py-1 rounded-full text-xs font-medium border";
+    const base = 'px-3 py-1 rounded-full text-xs font-medium border';
     switch (status) {
       case 'pending':
         return `${base} bg-amber-50 text-amber-700 border-amber-200`;
@@ -147,10 +173,17 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">Professional Blood Management</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
-              <span className="text-foreground font-medium hidden sm:inline-block">Welcome, {user.name}</span>
-              <Button onClick={handleLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              <span className="text-foreground font-medium hidden sm:inline-block">
+                Welcome, {user.name}
+              </span>
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
@@ -182,7 +215,9 @@ export default function DashboardPage() {
                       <User className="h-12 w-12 text-white" />
                     </div>
                     <h2 className="text-2xl font-semibold text-white mb-2">{user.name}</h2>
-                    <span className={`${getBloodGroupBadgeClass(user.bloodGroup)} bg-white/90 text-black border-transparent`}>
+                    <span
+                      className={`${getBloodGroupBadgeClass(user.bloodGroup)} bg-white/90 text-black border-transparent`}
+                    >
                       {user.bloodGroup}
                     </span>
                   </div>
@@ -200,7 +235,9 @@ export default function DashboardPage() {
                       <MapPin className="h-5 w-5 text-white/80" />
                       <div>
                         <p className="text-sm font-medium text-white/80">Location</p>
-                        <p className="text-sm text-white font-medium">{user.area}, {user.city}</p>
+                        <p className="text-sm text-white font-medium">
+                          {user.area}, {user.city}
+                        </p>
                       </div>
                     </div>
 
@@ -221,7 +258,10 @@ export default function DashboardPage() {
                       </Button>
                     </Link>
                     <Link href="/">
-                      <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white">
+                      <Button
+                        variant="outline"
+                        className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white"
+                      >
                         Back to Home
                       </Button>
                     </Link>
@@ -245,7 +285,9 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-foreground">{contactRequests.length}</div>
+                      <div className="text-2xl font-bold text-foreground">
+                        {contactRequests.length}
+                      </div>
                       <div className="text-xs text-muted-foreground">Total Requests</div>
                     </div>
                   </div>
@@ -256,10 +298,12 @@ export default function DashboardPage() {
                       <div className="bg-muted h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Bell className="h-8 w-8 text-muted-foreground" />
                       </div>
-                      <h3 className="text-lg font-medium text-foreground mb-2">No Contact Requests</h3>
+                      <h3 className="text-lg font-medium text-foreground mb-2">
+                        No Contact Requests
+                      </h3>
                       <p className="text-muted-foreground mb-6">
-                        You haven't received any contact requests yet. 
-                        Your profile is visible to blood seekers.
+                        You haven't received any contact requests yet. Your profile is visible to
+                        blood seekers.
                       </p>
                       <Link href="/find-donors">
                         <Button>Find Other Donors</Button>
@@ -268,15 +312,22 @@ export default function DashboardPage() {
                   ) : (
                     <div className="space-y-4">
                       {contactRequests.map((request) => (
-                        <div key={request.id} className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
+                        <div
+                          key={request.id}
+                          className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card"
+                        >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center space-x-3">
                               <div className="bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center">
                                 <User className="h-5 w-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="font-semibold text-foreground">{request.requester_name}</h3>
-                                <p className="text-sm text-muted-foreground">{request.requester_email}</p>
+                                <h3 className="font-semibold text-foreground">
+                                  {request.requester_name}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {request.requester_email}
+                                </p>
                               </div>
                             </div>
                             <span className={getStatusBadgeClass(request.status)}>
@@ -301,7 +352,9 @@ export default function DashboardPage() {
                             )}
                             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                               <Calendar className="h-4 w-4" />
-                              <span>Requested: {new Date(request.createdAt).toLocaleDateString()}</span>
+                              <span>
+                                Requested: {new Date(request.createdAt).toLocaleDateString()}
+                              </span>
                             </div>
                           </div>
 
@@ -335,7 +388,9 @@ export default function DashboardPage() {
                           {request.status === 'approved' && (
                             <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
                               <CheckCircle className="h-4 w-4" />
-                              <span className="text-sm font-medium">Contact information shared</span>
+                              <span className="text-sm font-medium">
+                                Contact information shared
+                              </span>
                             </div>
                           )}
 
@@ -367,36 +422,38 @@ export default function DashboardPage() {
                     Track your contribution to the blood donation community
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
                     <div className="bg-primary/10 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
                       <Users className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="text-2xl font-bold text-foreground">{contactRequests.length}</div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {contactRequests.length}
+                    </div>
                     <div className="text-sm text-muted-foreground">Contact Requests</div>
                   </div>
-                  
+
                   <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
                     <div className="bg-green-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
                       <CheckCircle className="h-6 w-6 text-green-600" />
                     </div>
                     <div className="text-2xl font-bold text-foreground">
-                      {contactRequests.filter(r => r.status === 'approved').length}
+                      {contactRequests.filter((r) => r.status === 'approved').length}
                     </div>
                     <div className="text-sm text-muted-foreground">Approved Requests</div>
                   </div>
-                  
+
                   <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
                     <div className="bg-amber-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
                       <Clock className="h-6 w-6 text-amber-600" />
                     </div>
                     <div className="text-2xl font-bold text-foreground">
-                      {contactRequests.filter(r => r.status === 'pending').length}
+                      {contactRequests.filter((r) => r.status === 'pending').length}
                     </div>
                     <div className="text-sm text-muted-foreground">Pending Requests</div>
                   </div>
-                  
+
                   <div className="text-center p-4 bg-background rounded-xl shadow-sm border border-border">
                     <div className="bg-blue-100 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
                       <Shield className="h-6 w-6 text-blue-600" />
@@ -413,5 +470,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
- 

@@ -6,7 +6,7 @@ const path = require('path');
 async function seedData() {
   const db = await open({
     filename: path.join(process.cwd(), 'bloodbank.db'),
-    driver: sqlite3.Database
+    driver: sqlite3.Database,
   });
 
   // Create tables if they don't exist
@@ -45,7 +45,7 @@ async function seedData() {
       phone: '+880 1712 345678',
       blood_group: 'A+',
       area: 'Gulshan',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Fatima Begum',
@@ -54,7 +54,7 @@ async function seedData() {
       phone: '+880 1812 345679',
       blood_group: 'B+',
       area: 'Banani',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Mohammad Ali',
@@ -63,7 +63,7 @@ async function seedData() {
       phone: '+880 1912 345680',
       blood_group: 'O+',
       area: 'Dhanmondi',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Ayesha Khan',
@@ -72,7 +72,7 @@ async function seedData() {
       phone: '+880 1612 345681',
       blood_group: 'AB+',
       area: 'Mohammadpur',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Rashid Hassan',
@@ -81,7 +81,7 @@ async function seedData() {
       phone: '+880 1512 345682',
       blood_group: 'A-',
       area: 'Mirpur',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Nusrat Jahan',
@@ -90,7 +90,7 @@ async function seedData() {
       phone: '+880 1412 345683',
       blood_group: 'B-',
       area: 'Uttara',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Kamal Uddin',
@@ -99,7 +99,7 @@ async function seedData() {
       phone: '+880 1312 345684',
       blood_group: 'O-',
       area: 'Motijheel',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Sabina Yasmin',
@@ -108,7 +108,7 @@ async function seedData() {
       phone: '+880 1212 345685',
       blood_group: 'AB-',
       area: 'Old Dhaka',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Zahid Hossain',
@@ -117,7 +117,7 @@ async function seedData() {
       phone: '+880 1112 345686',
       blood_group: 'A+',
       area: 'New Market',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Rehana Akter',
@@ -126,7 +126,7 @@ async function seedData() {
       phone: '+880 1012 345687',
       blood_group: 'B+',
       area: 'Farmgate',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Abdul Karim',
@@ -135,7 +135,7 @@ async function seedData() {
       phone: '+880 0912 345688',
       blood_group: 'O+',
       area: 'Tejgaon',
-      city: 'Dhaka'
+      city: 'Dhaka',
     },
     {
       name: 'Nasreen Begum',
@@ -144,15 +144,15 @@ async function seedData() {
       phone: '+880 0812 345689',
       blood_group: 'AB+',
       area: 'Ramna',
-      city: 'Dhaka'
-    }
+      city: 'Dhaka',
+    },
   ];
 
   console.log('Seeding database with sample donors...');
 
   for (const donor of sampleDonors) {
     const hashedPassword = await bcrypt.hash(donor.password, 12);
-    
+
     try {
       await db.run(
         `INSERT INTO users (email, password, name, phone, blood_group, area, city)
@@ -181,4 +181,4 @@ async function seedData() {
   await db.close();
 }
 
-seedData().catch(console.error); 
+seedData().catch(console.error);

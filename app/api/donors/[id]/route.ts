@@ -1,21 +1,15 @@
+import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/database';
 import { users } from '@/lib/schema';
-import { eq, and } from 'drizzle-orm';
 
-export async function GET(
-  request: NextRequest,
-  props: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
     const donorId = parseInt(params.id);
-    
+
     if (isNaN(donorId)) {
-      return NextResponse.json(
-        { error: 'Invalid donor ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid donor ID' }, { status: 400 });
     }
 
     const donorResult = await db
@@ -34,20 +28,14 @@ export async function GET(
     const donor = donorResult[0];
 
     if (!donor) {
-      return NextResponse.json(
-        { error: 'Donor not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Donor not found' }, { status: 404 });
     }
 
     return NextResponse.json({
-      donor
+      donor,
     });
   } catch (error) {
     console.error('Get donor error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

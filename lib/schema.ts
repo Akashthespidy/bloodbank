@@ -1,4 +1,4 @@
-import { pgTable, serial, text, boolean, timestamp, integer } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -15,8 +15,12 @@ export const users = pgTable('users', {
 
 export const contactRequests = pgTable('contact_requests', {
   id: serial('id').primaryKey(),
-  requesterId: integer('requester_id').notNull().references(() => users.id),
-  donorId: integer('donor_id').notNull().references(() => users.id),
+  requesterId: integer('requester_id')
+    .notNull()
+    .references(() => users.id),
+  donorId: integer('donor_id')
+    .notNull()
+    .references(() => users.id),
   status: text('status').default('pending'),
   message: text('message'),
   createdAt: timestamp('created_at').defaultNow(),
