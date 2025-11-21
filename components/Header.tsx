@@ -1,39 +1,28 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ChevronDown, Heart, Menu, User, X } from 'lucide-react';
+import { Heart, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
+import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 
 interface NavItem {
   name: string;
   href: string;
-  hasDropdown?: boolean;
-  dropdownItems?: { name: string; href: string; description?: string }[];
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  bloodGroup: string;
-  area: string;
-  city: string;
 }
 
 const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
   { name: 'About', href: '/about' },
+  { name: 'Dashboard', href: '/dashboard' },
 ];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const { theme } = useTheme();
+  const { user } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,23 +31,6 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsAuthenticated(false);
-    setUser(null);
-    window.location.href = '/';
-  };
 
   const headerVariants = {
     initial: { y: -100, opacity: 0 },
@@ -73,11 +45,6 @@ export default function Header() {
   const mobileMenuVariants = {
     closed: { opacity: 0, height: 0 },
     open: { opacity: 1, height: 'auto' },
-  };
-
-  const dropdownVariants = {
-    hidden: { opacity: 0, y: -10, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1 },
   };
 
   return (
@@ -118,109 +85,51 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden items-center space-x-8 lg:flex">
             {navItems.map((item) => (
-              <div
-                key={item.name}
-                className="relative"
-                onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.name)}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <Link
-                  prefetch={false}
-                  href={item.href}
-                  className="text-foreground flex items-center space-x-1 font-medium transition-colors duration-200 hover:text-primary"
-                >
-                  <span>{item.name}</span>
-                  {item.hasDropdown && (
-                    <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                  )}
-                </Link>
-
-                {item.hasDropdown && (
-                  <AnimatePresence>
-                    {activeDropdown === item.name && (
-                      <motion.div
-                        className="border-border bg-background/95 absolute top-full left-0 mt-2 w-64 overflow-hidden rounded-xl border shadow-xl backdrop-blur-lg"
-                        variants={dropdownVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        transition={{ duration: 0.2 }}
-                      >
-                        {item.dropdownItems?.map((dropdownItem) => (
-                          <Link
-                            prefetch={false}
-                            key={dropdownItem.name}
-                            href={dropdownItem.href}
-                            className="hover:bg-muted block px-4 py-3 transition-colors duration-200"
-                          >
-                            <div className="text-foreground font-medium">{dropdownItem.name}</div>
-                            {dropdownItem.description && (
-                              <div className="text-muted-foreground text-sm">
-                                {dropdownItem.description}
-                              </div>
-                            )}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
-              </div>
-            ))}
-            {isAuthenticated && (
               <Link
+                key={item.name}
                 prefetch={false}
-                href="/dashboard"
+                href={item.href}
                 className="text-foreground flex items-center space-x-1 font-medium transition-colors duration-200 hover:text-primary"
               >
-                <span>Dashboard</span>
+                <span>{item.name}</span>
               </Link>
-            )}
+            ))}
           </nav>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden items-center space-x-4 lg:flex">
-            {isAuthenticated ? (
-              <>
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{user?.name}</span>
-                  </div>
-
-                  <button
-                    onClick={handleLogout}
-                    className="text-foreground font-medium transition-colors duration-200 hover:text-primary"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <Link
-                  prefetch={false}
-                  href="/login"
-                  className="text-foreground font-medium transition-colors duration-200 hover:text-primary"
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md"
                 >
                   Sign In
-                </Link>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    prefetch={false}
-                    href="/register"
-                    className="inline-flex items-center space-x-2 rounded-full bg-gradient-to-r from-primary to-primary/80 px-6 py-2.5 font-medium text-white transition-all duration-200 hover:shadow-lg"
-                  >
-                    <span>Become a Donor</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </motion.div>
-              </>
-            )}
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-muted-foreground">
+                  {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+                </span>
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: 'h-10 w-10',
+                      userButtonPopoverCard: 'shadow-xl',
+                      userButtonPopoverActionButton: 'hover:bg-muted',
+                    },
+                  }}
+                />
+              </div>
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
           <motion.button
+            type="button"
             className="hover:bg-muted rounded-lg p-2 transition-colors duration-200 lg:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             whileTap={{ scale: 0.95 }}
@@ -253,49 +162,30 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="space-y-2 px-4 py-2">
-                  {isAuthenticated ? (
-                    <>
-                      <div className="text-sm text-muted-foreground px-2 py-1">
-                        Hi, {user?.name}
-                      </div>
-                      <Link
-                        prefetch={false}
-                        href="/dashboard"
-                        className="text-foreground hover:bg-muted block w-full rounded-lg py-2.5 text-center font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
+                  <SignedOut>
+                    <SignInButton mode="modal">
                       <button
-                        onClick={() => {
-                          handleLogout();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="text-foreground hover:bg-muted block w-full rounded-lg py-2.5 text-center font-medium transition-colors duration-200"
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        prefetch={false}
-                        href="/login"
-                        className="text-foreground hover:bg-muted block w-full rounded-lg py-2.5 text-center font-medium transition-colors duration-200"
+                        type="button"
+                        className="bg-blue-600 text-white w-full rounded-lg py-2.5 text-center font-medium hover:bg-blue-700 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         Sign In
-                      </Link>
-                      <Link
-                        prefetch={false}
-                        href="/register"
-                        className="block w-full rounded-lg bg-gradient-to-r from-primary to-primary/80 py-2.5 text-center font-medium text-white transition-all duration-200 hover:shadow-lg"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Become a Donor
-                      </Link>
-                    </>
-                  )}
+                      </button>
+                    </SignInButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <div className="text-sm text-muted-foreground px-2 py-1">
+                      {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+                    </div>
+                    <UserButton
+                      afterSignOutUrl="/"
+                      appearance={{
+                        elements: {
+                          avatarBox: 'h-10 w-10',
+                        },
+                      }}
+                    />
+                  </SignedIn>
                 </div>
               </div>
             </motion.div>

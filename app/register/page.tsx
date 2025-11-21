@@ -120,9 +120,9 @@ export default function RegisterPage() {
           <div className="bg-white/20 p-4 rounded-2xl mb-8 backdrop-blur-sm">
             <Heart className="h-12 w-12 text-white fill-white" />
           </div>
-          <h1 className="font-display text-4xl font-bold mb-4">Join Our Community</h1>
+          <h1 className="font-display text-4xl font-bold mb-4">Save Lives, Be a Hero</h1>
           <p className="text-lg text-white/90 max-w-md">
-            Become a part of the largest blood donor network in Bangladesh and help save lives.
+            Join thousands of donors across Bangladesh. Your blood can save up to 3 lives. Register now and make a difference!
           </p>
         </div>
       </div>
@@ -325,22 +325,19 @@ export default function RegisterPage() {
                   )}
                 />
 
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating Account...' : 'Create Account'}
+                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white" disabled={loading}>
+                  {loading ? 'Registering...' : 'Join Now as a Donor'}
                 </Button>
               </form>
             </Form>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 text-center">
             <div className="text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link href="/login" className="text-primary hover:underline font-medium">
-                Sign in here
-              </Link>
+              By registering, you agree to be contacted when someone needs your blood type.
             </div>
             <Link
               href="/"
-              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center justify-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" /> Back to Home
             </Link>
