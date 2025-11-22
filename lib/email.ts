@@ -21,7 +21,7 @@ export async function sendContactRequestEmail(
     // Send email to the donor's registered email address
     const { data, error } = await resend.emails.send({
       from: 'Blood Bank <onboarding@resend.dev>',
-      to: [donorEmail], // Send to donor's registered email
+      to: [requesterEmail], // Send to donor's registered email
       replyTo: requesterEmail, // Requester's email for replies
       subject: 'Urgent Blood Donation Request',
       html: `
