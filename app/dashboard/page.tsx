@@ -94,14 +94,6 @@ export default function DashboardPage() {
     phone: '',
   });
 
-  useEffect(() => {
-    if (isSignedIn) {
-      loadDonorInfo();
-    } else {
-      setLoading(false);
-    }
-  }, [isSignedIn, loadDonorInfo]);
-
   const loadDonorInfo = async () => {
     try {
       const response = await fetch('/api/donor-profile');
@@ -124,6 +116,15 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isSignedIn) {
+      loadDonorInfo();
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn]);
 
   const loadContactRequests = async () => {
     try {

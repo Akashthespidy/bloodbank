@@ -342,6 +342,7 @@ export default function FindDonorsPage() {
                         </p>
                       </div>
                       <button
+                        type="button"
                         onClick={() => setShowBulkMessage(false)}
                         className="text-blue-600 hover:text-blue-800"
                       >
