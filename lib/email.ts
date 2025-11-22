@@ -18,12 +18,11 @@ export async function sendContactRequestEmail(
   }
 ) {
   try {
-    // In Resend testing mode, send to requester's email instead of donor's
-    // Once domain is verified, change back to donorEmail
+    // Send email to the donor's registered email address
     const { data, error } = await resend.emails.send({
       from: 'Blood Bank <onboarding@resend.dev>',
-      to: [requesterEmail], // Using requester email for testing mode
-      replyTo: requesterEmail,
+      to: [donorEmail], // Send to donor's registered email
+      replyTo: requesterEmail, // Requester's email for replies
       subject: 'Urgent Blood Donation Request',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff;">
@@ -32,13 +31,6 @@ export async function sendContactRequestEmail(
           </div>
           
           <div style="padding: 30px; background-color: #fef2f2; border-radius: 0 0 10px 10px;">
-            <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; margin-bottom: 20px;">
-              <p style="margin: 0; color: #92400e; font-size: 13px;">
-                <strong>📧 Testing Mode:</strong> This email is sent to you (the requester) for testing purposes. 
-                In production, this will be sent to the donor: <strong>${donorEmail}</strong>
-              </p>
-            </div>
-            
             <p style="font-size: 16px; color: #333;">Hello <strong>${donorName}</strong>,</p>
             <p style="font-size: 14px; color: #666; line-height: 1.6;">
               Someone urgently needs blood donation and would like to contact you. Please review the details below:
