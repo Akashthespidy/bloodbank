@@ -24,3 +24,16 @@ export const contactRequests = pgTable('contact_requests', {
   message: text('message'),
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const ratings = pgTable('ratings', {
+  id: serial('id').primaryKey(),
+  donorId: integer('donor_id')
+    .notNull()
+    .references(() => users.id),
+  raterId: integer('rater_id')
+    .notNull()
+    .references(() => users.id),
+  rating: integer('rating').notNull(), // 1-5 stars
+  comment: text('comment'),
+  createdAt: timestamp('created_at').defaultNow(),
+});

@@ -1,5 +1,6 @@
 'use client';
 
+import { SignOutButton, useAuth, useUser } from '@clerk/nextjs';
 import {
   Bell,
   Calendar,
@@ -20,15 +21,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useAuth, useUser, SignOutButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -63,7 +57,16 @@ interface ContactRequest {
 }
 
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-const cities = ['Dhaka', 'Chittagong', 'Sylhet', 'Rajshahi', 'Khulna', 'Barishal', 'Rangpur', 'Mymensingh'];
+const cities = [
+  'Dhaka',
+  'Chittagong',
+  'Sylhet',
+  'Rajshahi',
+  'Khulna',
+  'Barishal',
+  'Rangpur',
+  'Mymensingh',
+];
 
 const areasByCity: Record<string, string[]> = {
   Dhaka: ['Dhanmondi', 'Gulshan', 'Banani', 'Mirpur', 'Uttara', 'Mohammadpur', 'Motijheel'],
@@ -97,7 +100,7 @@ export default function DashboardPage() {
     } else {
       setLoading(false);
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, loadDonorInfo]);
 
   const loadDonorInfo = async () => {
     try {
@@ -149,12 +152,15 @@ export default function DashboardPage() {
       } else {
         alert('Failed to update profile');
       }
-    } catch (error) {
+    } catch (_error) {
       alert('Failed to update profile');
     }
   };
 
-  const handleContactRequestResponse = async (requestId: number, status: 'approved' | 'rejected') => {
+  const handleContactRequestResponse = async (
+    requestId: number,
+    status: 'approved' | 'rejected'
+  ) => {
     try {
       const response = await fetch('/api/contact-requests', {
         method: 'PATCH',
@@ -168,12 +174,12 @@ export default function DashboardPage() {
       } else {
         alert('Failed to update contact request');
       }
-    } catch (error) {
+    } catch (_error) {
       alert('Failed to update contact request');
     }
   };
 
-  const getBloodGroupBadgeClass = (bloodGroup: string) => {
+  const getBloodGroupBadgeClass = (_bloodGroup: string) => {
     const base = 'px-3 py-1 rounded-full text-sm font-bold shadow-sm';
     return `${base} bg-red-100 text-red-700 border border-red-200`;
   };
@@ -244,7 +250,11 @@ export default function DashboardPage() {
                 {clerkUser?.firstName || clerkUser?.emailAddresses[0]?.emailAddress}
               </span>
               <SignOutButton>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   Sign Out
                 </Button>
               </SignOutButton>
@@ -301,7 +311,9 @@ export default function DashboardPage() {
                         <User className="h-12 w-12 text-white" />
                       </div>
                       <h2 className="text-2xl font-semibold text-white mb-2">{donorInfo?.name}</h2>
-                      <span className={`${getBloodGroupBadgeClass(donorInfo?.bloodGroup || '')} bg-white/90 text-black border-transparent`}>
+                      <span
+                        className={`${getBloodGroupBadgeClass(donorInfo?.bloodGroup || '')} bg-white/90 text-black border-transparent`}
+                      >
                         {donorInfo?.bloodGroup}
                       </span>
                     </div>
@@ -356,7 +368,12 @@ export default function DashboardPage() {
                       <div className="space-y-4">
                         <div>
                           <Label className="text-white/80">Blood Group</Label>
-                          <Select value={editForm.bloodGroup} onValueChange={(value) => setEditForm({ ...editForm, bloodGroup: value })}>
+                          <Select
+                            value={editForm.bloodGroup}
+                            onValueChange={(value) =>
+                              setEditForm({ ...editForm, bloodGroup: value })
+                            }
+                          >
                             <SelectTrigger className="bg-white/10 border-white/20 text-white">
                               <SelectValue />
                             </SelectTrigger>
@@ -393,7 +410,10 @@ export default function DashboardPage() {
 
                         <div>
                           <Label className="text-white/80">Area</Label>
-                          <Select value={editForm.area} onValueChange={(value) => setEditForm({ ...editForm, area: value })}>
+                          <Select
+                            value={editForm.area}
+                            onValueChange={(value) => setEditForm({ ...editForm, area: value })}
+                          >
                             <SelectTrigger className="bg-white/10 border-white/20 text-white">
                               <SelectValue />
                             </SelectTrigger>
@@ -418,7 +438,10 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="flex space-x-2">
-                          <Button onClick={handleSaveEdit} className="flex-1 bg-white text-[#800000] hover:bg-gray-100">
+                          <Button
+                            onClick={handleSaveEdit}
+                            className="flex-1 bg-white text-[#800000] hover:bg-gray-100"
+                          >
                             <Save className="h-4 w-4 mr-2" />
                             Save
                           </Button>
@@ -442,7 +465,10 @@ export default function DashboardPage() {
                         </Button>
                       </Link>
                       <Link href="/">
-                        <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white">
+                        <Button
+                          variant="outline"
+                          className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white"
+                        >
                           Back to Home
                         </Button>
                       </Link>
@@ -466,7 +492,9 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-foreground">{contactRequests.length}</div>
+                        <div className="text-2xl font-bold text-foreground">
+                          {contactRequests.length}
+                        </div>
                         <div className="text-xs text-muted-foreground">Total Requests</div>
                       </div>
                     </div>
@@ -477,9 +505,12 @@ export default function DashboardPage() {
                         <div className="bg-muted h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                           <Bell className="h-8 w-8 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-medium text-foreground mb-2">No Contact Requests</h3>
+                        <h3 className="text-lg font-medium text-foreground mb-2">
+                          No Contact Requests
+                        </h3>
                         <p className="text-muted-foreground mb-6">
-                          You haven't received any contact requests yet. Your profile is visible to blood seekers.
+                          You haven't received any contact requests yet. Your profile is visible to
+                          blood seekers.
                         </p>
                         <Link href="/find-donors">
                           <Button>Find Other Donors</Button>
@@ -498,8 +529,12 @@ export default function DashboardPage() {
                                   <User className="h-5 w-5 text-primary" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-foreground">{request.requester_name}</h3>
-                                  <p className="text-sm text-muted-foreground">{request.requester_email}</p>
+                                  <h3 className="font-semibold text-foreground">
+                                    {request.requester_name}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    {request.requester_email}
+                                  </p>
                                 </div>
                               </div>
                               <span className={getStatusBadgeClass(request.status)}>
@@ -524,7 +559,9 @@ export default function DashboardPage() {
                               )}
                               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                                 <Calendar className="h-4 w-4" />
-                                <span>Requested: {new Date(request.createdAt).toLocaleDateString()}</span>
+                                <span>
+                                  Requested: {new Date(request.createdAt).toLocaleDateString()}
+                                </span>
                               </div>
                             </div>
 
@@ -537,7 +574,9 @@ export default function DashboardPage() {
                             {request.status === 'pending' && (
                               <div className="flex space-x-3">
                                 <Button
-                                  onClick={() => handleContactRequestResponse(request.id, 'approved')}
+                                  onClick={() =>
+                                    handleContactRequestResponse(request.id, 'approved')
+                                  }
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-white"
                                 >
@@ -545,7 +584,9 @@ export default function DashboardPage() {
                                   Approve
                                 </Button>
                                 <Button
-                                  onClick={() => handleContactRequestResponse(request.id, 'rejected')}
+                                  onClick={() =>
+                                    handleContactRequestResponse(request.id, 'rejected')
+                                  }
                                   size="sm"
                                   variant="destructive"
                                 >
@@ -558,7 +599,9 @@ export default function DashboardPage() {
                             {request.status === 'approved' && (
                               <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
                                 <CheckCircle className="h-4 w-4" />
-                                <span className="text-sm font-medium">Contact information shared</span>
+                                <span className="text-sm font-medium">
+                                  Contact information shared
+                                </span>
                               </div>
                             )}
 
@@ -588,7 +631,9 @@ export default function DashboardPage() {
                       <Heart className="h-8 w-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-semibold text-foreground mb-2">Your Impact</h3>
-                    <p className="text-muted-foreground">Track your contribution to the blood donation community</p>
+                    <p className="text-muted-foreground">
+                      Track your contribution to the blood donation community
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -596,7 +641,9 @@ export default function DashboardPage() {
                       <div className="bg-primary/10 h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-3">
                         <Users className="h-6 w-6 text-primary" />
                       </div>
-                      <div className="text-2xl font-bold text-foreground">{contactRequests.length}</div>
+                      <div className="text-2xl font-bold text-foreground">
+                        {contactRequests.length}
+                      </div>
                       <div className="text-sm text-muted-foreground">Contact Requests</div>
                     </div>
 

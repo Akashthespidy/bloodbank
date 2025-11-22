@@ -32,6 +32,13 @@ export async function sendContactRequestEmail(
           </div>
           
           <div style="padding: 30px; background-color: #fef2f2; border-radius: 0 0 10px 10px;">
+            <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; margin-bottom: 20px;">
+              <p style="margin: 0; color: #92400e; font-size: 13px;">
+                <strong>📧 Testing Mode:</strong> This email is sent to you (the requester) for testing purposes. 
+                In production, this will be sent to the donor: <strong>${donorEmail}</strong>
+              </p>
+            </div>
+            
             <p style="font-size: 16px; color: #333;">Hello <strong>${donorName}</strong>,</p>
             <p style="font-size: 14px; color: #666; line-height: 1.6;">
               Someone urgently needs blood donation and would like to contact you. Please review the details below:

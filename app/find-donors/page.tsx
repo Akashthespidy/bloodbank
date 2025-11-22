@@ -2,6 +2,7 @@
 
 import { useAuth } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAtom } from 'jotai';
 import {
   ArrowLeft,
   Calendar,
@@ -16,13 +17,9 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -38,71 +35,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useDonors, useSearchFilters } from '@/lib/hooks';
+import {
+  availableAreasAtom,
+  bulkMessageAtom,
+  type SearchFilters,
+  searchFiltersSchema,
+  sendingBulkAtom,
+  showBulkMessageAtom,
+} from '@/lib/store';
 import { bangladeshCities, bloodGroups, getAreasForCity } from '@/lib/utils';
 
-const searchSchema = z.object({
-  bloodGroup: z.string().optional(),
-  area: z.string().optional(),
-  city: z.string().optional(),
-});
-
-type SearchForm = z.infer<typeof searchSchema>;
-
-interface Donor {
-  id: number;
-  name: string;
-  bloodGroup: string;
-  area: string;
-  city: string;
-  createdAt: string;
-}
+const searchSchema = searchFiltersSchema;
+type SearchForm = SearchFilters;
 
 export default function FindDonorsPage() {
-  const [donors, setDonors] = useState<Donor[]>([]);
-  const [loading, setLoading] = useState(false);
   const { isSignedIn, getToken } = useAuth();
+  const { donors, loading, fetchDonors } = useDonors();
+  const { filters, updateFilters, resetFilters } = useSearchFilters();
+
+  const [showBulkMessage, setShowBulkMessage] = useAtom(showBulkMessageAtom);
+  const [bulkMessage, setBulkMessage] = useAtom(bulkMessageAtom);
+  const [sendingBulk, setSendingBulk] = useAtom(sendingBulkAtom);
+  const [availableAreas, setAvailableAreas] = useAtom(availableAreasAtom);
   const [selectedCity, setSelectedCity] = useState<string>('all');
-  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
-  const [showBulkMessage, setShowBulkMessage] = useState(false);
-  const [bulkMessage, setBulkMessage] = useState('');
-  const [sendingBulk, setSendingBulk] = useState(false);
 
   const form = useForm<SearchForm>({
     resolver: zodResolver(searchSchema),
-    defaultValues: {
-      bloodGroup: 'all',
-      area: 'all',
-      city: 'all',
-    },
+    defaultValues: filters,
   });
 
   useEffect(() => {
-    searchDonors();
-  }, []);
+    fetchDonors();
+  }, [fetchDonors]);
 
-  const searchDonors = async (filters?: SearchForm) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (filters?.bloodGroup && filters.bloodGroup !== 'all')
-        params.append('bloodGroup', filters.bloodGroup);
-      if (filters?.area && filters.area !== 'all') params.append('area', filters.area);
-      if (filters?.city && filters.city !== 'all') params.append('city', filters.city);
-
-      const response = await fetch(`/api/donors?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setDonors(data.donors);
-      }
-    } catch (error) {
-      console.error('Error searching donors:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = (data: SearchForm) => {
-    searchDonors(data);
+  const handleSearch = async (data: SearchForm) => {
+    updateFilters(data);
+    await fetchDonors(data);
   };
 
   const getBloodGroupVariant = (
@@ -119,7 +88,6 @@ export default function FindDonorsPage() {
     } else {
       setAvailableAreas(getAreasForCity(city));
     }
-    // Reset area selection when city changes
     form.setValue('area', 'all');
   };
 
@@ -158,7 +126,7 @@ export default function FindDonorsPage() {
         const error = await response.json();
         alert(error.error || 'Failed to send bulk message');
       }
-    } catch (error) {
+    } catch (_error) {
       alert('Failed to send bulk message');
     } finally {
       setSendingBulk(false);
@@ -320,10 +288,13 @@ export default function FindDonorsPage() {
                     />
                   </div>
 
-                  <div className="flex justify-center">
+                  <div className="flex justify-center gap-4">
                     <Button type="submit" disabled={loading} size="lg">
                       <Search className="mr-2 h-5 w-5" />
                       {loading ? 'Searching...' : 'Search Donors'}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={resetFilters} size="lg">
+                      Clear Filters
                     </Button>
                   </div>
                 </form>
@@ -419,7 +390,7 @@ export default function FindDonorsPage() {
                   <p className="text-muted-foreground mb-6">
                     Try adjusting your search criteria or check back later for new donors.
                   </p>
-                  <Button onClick={() => form.reset()} variant="outline">
+                  <Button onClick={resetFilters} variant="outline">
                     Clear Filters
                   </Button>
                 </CardContent>

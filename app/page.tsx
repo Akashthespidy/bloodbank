@@ -1,8 +1,7 @@
 'use client';
 
-import { Activity, ArrowRight, Calendar, Search, ShieldCheck, UserPlus, Users } from 'lucide-react';
+import { Activity, ArrowRight, ShieldCheck, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
-import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { GradientBars } from '@/components/ui/gradient-bars';
@@ -11,7 +10,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Animated Header */}
-
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-b from-red-50/50 to-background dark:from-red-950/20 dark:to-background">

@@ -1,18 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  ArrowLeft,
-  Droplets,
-  Eye,
-  EyeOff,
-  Heart,
-  Lock,
-  Mail,
-  MapPin,
-  Phone,
-  User,
-} from 'lucide-react';
+import { ArrowLeft, Droplets, Heart, Mail, MapPin, Phone, User } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -88,7 +77,7 @@ export default function RegisterPage() {
         const error = await response.json();
         alert(error.error || 'Registration failed. Please try again.');
       }
-    } catch (error) {
+    } catch (_error) {
       alert('Registration failed. Please try again.');
     } finally {
       setLoading(false);
@@ -119,7 +108,8 @@ export default function RegisterPage() {
           </div>
           <h1 className="font-display text-4xl font-bold mb-4">Save Lives, Be a Hero</h1>
           <p className="text-lg text-white/90 max-w-md">
-            Join thousands of donors across Bangladesh. Your blood can save up to 3 lives. Register now and make a difference!
+            Join thousands of donors across Bangladesh. Your blood can save up to 3 lives. Register
+            now and make a difference!
           </p>
         </div>
       </div>
@@ -290,7 +280,11 @@ export default function RegisterPage() {
                   )}
                 />
 
-                <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white" disabled={loading}>
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={loading}
+                >
                   {loading ? 'Registering...' : 'Join Now as a Donor'}
                 </Button>
               </form>

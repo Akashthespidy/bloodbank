@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { sql } from 'drizzle-orm';
 import { db } from '../lib/database';
-import { users } from '../lib/schema';
 
 async function updateDonors() {
   console.log('🔄 Updating all users to be donors...');

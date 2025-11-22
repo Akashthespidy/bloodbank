@@ -1,9 +1,9 @@
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { auth, clerkClient } from '@clerk/nextjs/server';
-import { sendContactRequestEmail } from '@/lib/email';
 import { db } from '@/lib/database';
+import { sendContactRequestEmail } from '@/lib/email';
 import { contactRequests, users } from '@/lib/schema';
 
 const contactRequestSchema = z.object({
@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
     const client = await clerkClient();
     const clerkUser = await client.users.getUser(userId);
     const email = clerkUser.emailAddresses[0]?.emailAddress;
-    const name = clerkUser.firstName ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() : email?.split('@')[0] || 'User';
+    const name = clerkUser.firstName
+      ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim()
+      : email?.split('@')[0] || 'User';
 
     if (!email) {
       return NextResponse.json({ error: 'Email not found' }, { status: 400 });
@@ -108,6 +110,7 @@ export async function POST(request: NextRequest) {
       donor.email,
       donor.name,
       name,
+      email, // requester email
       donor.bloodGroup,
       donor.area,
       {

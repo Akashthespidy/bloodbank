@@ -1,10 +1,10 @@
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { and, desc, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
 import { db } from '@/lib/database';
 import { contactRequests, users } from '@/lib/schema';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Verify Clerk authentication
     const { userId } = await auth();
