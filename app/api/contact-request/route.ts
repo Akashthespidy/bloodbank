@@ -1,18 +1,18 @@
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { auth, clerkClient } from '@clerk/nextjs/server';
-import { sendContactRequestEmail } from '@/lib/auth';
 import { db } from '@/lib/database';
+import { sendContactRequestEmail } from '@/lib/email';
 import { contactRequests, users } from '@/lib/schema';
 
 const contactRequestSchema = z.object({
   donorId: z.number(),
-  hospital: z.string().optional(),
-  address: z.string().optional(),
-  contact: z.string().optional(),
-  time: z.string().optional(),
-  message: z.string().optional(),
+  hospital: z.string().min(3, 'Hospital name is required'),
+  address: z.string().min(5, 'Address is required'),
+  contact: z.string().min(10, 'Contact number is required'),
+  time: z.string().min(1, 'Time is required'),
+  message: z.string().min(10, 'Message is required'),
 });
 
 export async function POST(request: NextRequest) {
@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
     const client = await clerkClient();
     const clerkUser = await client.users.getUser(userId);
     const email = clerkUser.emailAddresses[0]?.emailAddress;
-    const name = clerkUser.firstName ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() : email?.split('@')[0] || 'User';
+    const name = clerkUser.firstName
+      ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim()
+      : email?.split('@')[0] || 'User';
 
     if (!email) {
       return NextResponse.json({ error: 'Email not found' }, { status: 400 });
@@ -44,7 +46,6 @@ export async function POST(request: NextRequest) {
       requesterId = existingRequester[0].id;
     } else {
       // Create a new user record for the requester (non-donor by default)
-      // We need to provide dummy values for required fields since this is just a requester
       const newUser = await db
         .insert(users)
         .values({
@@ -100,15 +101,16 @@ export async function POST(request: NextRequest) {
       .values({
         requesterId: requesterId,
         donorId: validatedData.donorId,
-        message: validatedData.message || null,
+        message: validatedData.message,
       })
       .returning({ id: contactRequests.id });
 
     // Send email to donor with structured information
-    await sendContactRequestEmail(
+    const emailResult = await sendContactRequestEmail(
       donor.email,
       donor.name,
       name,
+      email, // requester email
       donor.bloodGroup,
       donor.area,
       {
@@ -119,6 +121,12 @@ export async function POST(request: NextRequest) {
         message: validatedData.message,
       }
     );
+
+    if (!emailResult.success) {
+      console.error('Failed to send email:', emailResult.error);
+      // We don't fail the request if email fails, but we log it.
+      // Optionally we could return a warning.
+    }
 
     return NextResponse.json({
       message: 'Contact request sent successfully',

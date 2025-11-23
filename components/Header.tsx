@@ -1,11 +1,11 @@
 'use client';
 
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useState } from 'react';
-import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
+import { useEffect, useState } from 'react';
 
 interface NavItem {
   name: string;
@@ -68,7 +68,7 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between lg:h-20">
           {/* Logo */}
           <motion.div
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 flex-shrink-0"
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
@@ -82,8 +82,8 @@ export default function Header() {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center space-x-8 lg:flex">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2 items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -97,7 +97,7 @@ export default function Header() {
           </nav>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden items-center space-x-4 lg:flex">
+          <div className="hidden items-center space-x-4 lg:flex flex-shrink-0">
             <SignedOut>
               <SignInButton mode="modal">
                 <button

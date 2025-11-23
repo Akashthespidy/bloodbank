@@ -62,7 +62,7 @@ export default function LoginPage() {
         const error = await response.json();
         alert(error.error || 'Login failed. Please check your credentials.');
       }
-    } catch (error) {
+    } catch (_error) {
       alert('Login failed. Please try again.');
     } finally {
       setLoading(false);

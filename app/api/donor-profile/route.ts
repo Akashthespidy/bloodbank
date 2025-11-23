@@ -1,8 +1,8 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
+import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/database';
 import { users } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
 
 // GET - Get donor info by Clerk email
 export async function GET() {

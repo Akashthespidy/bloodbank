@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
-import { hashPassword } from '../lib/auth';
 import { db } from '../lib/database';
 import { users } from '../lib/schema';
 

@@ -1,7 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import bcrypt from 'bcryptjs';
 import Database from 'better-sqlite3';
-import fs from 'fs';
-import path from 'path';
 
 const dbPath = path.join(process.cwd(), 'bloodbank.db');
 

@@ -6,13 +6,12 @@ import {
   ArrowLeft,
   Calendar,
   Droplets,
-  Heart,
   LogIn,
-  Mail,
   MapPin,
   MessageSquare,
   Send,
   Shield,
+  Star,
   User,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -21,17 +20,11 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useContactRequests, useRatings } from '@/lib/hooks';
+import type { Donor } from '@/lib/store';
 
 const contactSchema = z.object({
   hospital: z.string().min(3, 'Hospital name must be at least 3 characters'),
@@ -46,15 +39,6 @@ const contactSchema = z.object({
 
 type ContactForm = z.infer<typeof contactSchema>;
 
-interface Donor {
-  id: number;
-  name: string;
-  bloodGroup: string;
-  area: string;
-  city: string;
-  createdAt: string;
-}
-
 export default function ContactDonorPage() {
   const params = useParams();
   const router = useRouter();
@@ -63,16 +47,19 @@ export default function ContactDonorPage() {
   const { user } = useUser();
 
   const [donor, setDonor] = useState<Donor | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [_loading, _setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [userRating, setUserRating] = useState(0);
+  const [ratingComment, setRatingComment] = useState('');
+  const [submittingRating, setSubmittingRating] = useState(false);
+
+  // Use Jotai hooks
+  const { ratings, averageRating, totalRatings, fetchRatings, submitRating } = useRatings(donorId);
+  const { sendContactRequest } = useContactRequests();
 
   const contactForm = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
   });
-
-  useEffect(() => {
-    fetchDonorDetails();
-  }, [donorId]);
 
   const fetchDonorDetails = async () => {
     try {
@@ -90,6 +77,12 @@ export default function ContactDonorPage() {
     }
   };
 
+  useEffect(() => {
+    fetchDonorDetails();
+    fetchRatings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [donorId]);
+
   const handleContactRequest = async (data: ContactForm) => {
     if (!isSignedIn) {
       alert('Please sign in to contact donors');
@@ -97,36 +90,39 @@ export default function ContactDonorPage() {
     }
 
     setSending(true);
-    try {
-      const token = await getToken();
-      const response = await fetch('/api/contact-request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          donorId: parseInt(donorId),
-          hospital: data.hospital,
-          address: data.address,
-          contact: data.contact,
-          time: data.time,
-          message: data.message,
-        }),
-      });
+    const result = await sendContactRequest(parseInt(donorId, 10), data, getToken);
 
-      if (response.ok) {
-        alert('Contact request sent successfully! The donor will be notified via email.');
-        router.push('/find-donors');
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Failed to send contact request');
-      }
-    } catch (error) {
-      alert('Failed to send contact request');
-    } finally {
-      setSending(false);
+    if (result.success) {
+      alert('Contact request sent successfully! The donor will be notified via email.');
+      router.push('/find-donors');
+    } else {
+      alert(result.error || 'Failed to send contact request');
     }
+    setSending(false);
+  };
+
+  const handleSubmitRating = async () => {
+    if (!isSignedIn) {
+      alert('Please sign in to rate donors');
+      return;
+    }
+
+    if (userRating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+
+    setSubmittingRating(true);
+    const result = await submitRating(userRating, ratingComment, getToken);
+
+    if (result.success) {
+      alert('Rating submitted successfully!');
+      setUserRating(0);
+      setRatingComment('');
+    } else {
+      alert(result.error || 'Failed to submit rating');
+    }
+    setSubmittingRating(false);
   };
 
   const getBloodGroupBadgeClass = (bloodGroup: string) => {
@@ -362,6 +358,119 @@ export default function ContactDonorPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Rating Section */}
+        <Card className="bg-white border-none shadow-lg mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between text-black">
+              <div className="flex items-center space-x-2">
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <span>Donor Ratings</span>
+              </div>
+              {totalRatings > 0 && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl font-bold text-yellow-500">{averageRating}</span>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-4 w-4 ${
+                          star <= averageRating
+                            ? 'text-yellow-500 fill-yellow-500'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-500">({totalRatings} reviews)</span>
+                </div>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Rating Form */}
+            {isSignedIn && (
+              <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+                <h3 className="font-semibold text-black">Rate this donor</h3>
+                <div className="flex items-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setUserRating(star)}
+                      className="focus:outline-none transition-transform hover:scale-110"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          star <= userRating
+                            ? 'text-yellow-500 fill-yellow-500'
+                            : 'text-gray-300 hover:text-yellow-400'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  {userRating > 0 && (
+                    <span className="text-sm text-gray-600 ml-2">
+                      {userRating} star{userRating > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+                <Textarea
+                  value={ratingComment}
+                  onChange={(e) => setRatingComment(e.target.value)}
+                  placeholder="Share your experience (optional)..."
+                  rows={3}
+                  className="bg-white border-gray-300 text-black resize-none"
+                />
+                <Button
+                  onClick={handleSubmitRating}
+                  disabled={submittingRating || userRating === 0}
+                  className="w-full"
+                >
+                  {submittingRating ? 'Submitting...' : 'Submit Rating'}
+                </Button>
+              </div>
+            )}
+
+            {/* Ratings List */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-black">Reviews</h3>
+              {ratings.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">No ratings yet</p>
+              ) : (
+                ratings.map((rating) => (
+                  <div key={rating.id} className="border-b pb-4 last:border-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="font-medium text-black">{rating.raterName}</span>
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`h-3 w-3 ${
+                                  star <= rating.rating
+                                    ? 'text-yellow-500 fill-yellow-500'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        {rating.comment && (
+                          <p className="text-sm text-gray-600">{rating.comment}</p>
+                        )}
+                        <p className="text-xs text-gray-400 mt-1">
+                          {new Date(rating.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

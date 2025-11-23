@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/database';
 import { users } from '@/lib/schema';
 
-export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
-    const donorId = parseInt(params.id);
+    const donorId = parseInt(params.id, 10);
 
-    if (isNaN(donorId)) {
+    if (Number.isNaN(donorId)) {
       return NextResponse.json({ error: 'Invalid donor ID' }, { status: 400 });
     }
 

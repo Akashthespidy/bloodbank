@@ -1,5 +1,5 @@
+import path from 'node:path';
 import Database from 'better-sqlite3';
-import path from 'path';
 
 const dbPath = path.join(process.cwd(), 'bloodbank.db');
 const db = new Database(dbPath, { readonly: true });
@@ -47,7 +47,7 @@ const requestCount = db.prepare('SELECT COUNT(*) as count FROM contact_requests'
 };
 console.log(`\n\n💌 Contact Requests: ${requestCount.count}`);
 
-console.log('\n' + '='.repeat(80));
+console.log(`\n${'='.repeat(80)}`);
 console.log('✅ Database verification complete!');
 console.log('🔐 All users have password: "password123"');
 console.log('🌐 Start the app with: pnpm dev');
